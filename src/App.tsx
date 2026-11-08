@@ -9,11 +9,12 @@ import './styles/twin.css';
 export default function App() {
   const host = useRef<HTMLDivElement>(null);
   const twin = useRef<Twin | null>(null);
-  const [hour, setHour] = useState(20);
-  const [play, setPlay] = useState(true);
-  const [sc, setSc] = useState<string>('');
-  const [lev, setLev] = useState(false);
-  const [view, setView] = useState<'local' | 'global'>('local');
+  const q = new URLSearchParams(location.search);
+  const [hour, setHour] = useState(Number(q.get('h') ?? 20));
+  const [play, setPlay] = useState(q.get('play') !== '0');
+  const [sc, setSc] = useState<string>(q.get('sc') ?? '');
+  const [lev, setLev] = useState(q.get('lev') === '1');
+  const [view, setView] = useState<'local' | 'global'>(q.get('view') === 'global' ? 'global' : 'local');
   const scenario = sc ? SCENARIO_BY_ID[sc] : null;
   const run = useMemo(
     () => simulate({ disruption: scenario ? toDisruption(scenario) : null, levers: lev && scenario ? scenario.levers.slice(0, 2) : [], record: true }),

@@ -120,6 +120,7 @@ export class Twin {
     this.resizeObs.observe(container);
     this.renderer.domElement.addEventListener('pointerup', this.handlePointer);
     this.renderer.domElement.addEventListener('pointerdown', this.handleDown);
+    if (import.meta.env.DEV) (window as unknown as { __twin: Twin }).__twin = this;
   }
 
   async init(onProgress?: (f: number) => void) {
