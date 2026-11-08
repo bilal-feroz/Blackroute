@@ -50,6 +50,8 @@ export function waterMaterial(): THREE.ShaderMaterial {
       uShallow: { value: new THREE.Color('#0f5f62') },
       uLine: { value: new THREE.Color('#5eead4') },
       uQuayX: { value: -40 },
+      uTrace: { value: 1 },
+      uTraceScale: { value: 1.6 },
     },
     vertexShader: /* glsl */ `
       varying vec3 vWorld;
@@ -65,10 +67,13 @@ export function waterMaterial(): THREE.ShaderMaterial {
       uniform vec3 uShallow;
       uniform vec3 uLine;
       uniform float uQuayX;
+      uniform float uTrace;
+      uniform float uTraceScale;
       varying vec3 vWorld;
+      // 1 on the grid line, fading to 0 within w of it
       float line(float v, float w) {
-        float f = abs(fract(v) - 0.5);
-        return smoothstep(w, 0.0, f - (0.5 - w));
+        float d = abs(fract(v + 0.5) - 0.5);
+        return 1.0 - smoothstep(0.0, w, d);
       }
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       void main() {
@@ -77,14 +82,14 @@ export function waterMaterial(): THREE.ShaderMaterial {
         float swell = sin(vWorld.z * 0.22 + uTime * 0.7) * sin(vWorld.x * 0.15 - uTime * 0.5);
         col *= 0.92 + 0.08 * swell;
         // circuit-board traces in the water, like the concept art
-        vec2 g = vWorld.xz / 1.6;
+        vec2 g = vWorld.xz / uTraceScale;
         vec2 cell = floor(g);
         float on = step(0.7, hash(cell));
         float trace = max(line(g.x, 0.025) * step(0.5, hash(cell + 7.0)), line(g.y, 0.025) * step(0.5, hash(cell + 3.0))) * on;
         float spark = smoothstep(0.94, 1.0, fract(hash(cell) * 9.0 + uTime * 0.2));
-        col += uLine * trace * (0.12 + spark * 0.5);
+        col += uLine * trace * (0.12 + spark * 0.5) * uTrace;
         vec2 f = fract(g) - 0.5;
-        col += uLine * on * smoothstep(0.08, 0.0, length(f)) * 0.25;
+        col += uLine * on * smoothstep(0.08, 0.0, length(f)) * 0.25 * uTrace;
         // light glow along the quay
         col += uLine * exp(-max(0.0, uQuayX - vWorld.x) * 0.5) * 0.25;
         gl_FragColor = vec4(col, 1.0);
@@ -113,9 +118,10 @@ export function gridMaterial(): THREE.ShaderMaterial {
     fragmentShader: /* glsl */ `
       uniform vec3 uColor;
       varying vec3 vWorld;
+      // 1 on the grid line, fading to 0 within w of it
       float line(float v, float w) {
-        float f = abs(fract(v) - 0.5);
-        return smoothstep(w, 0.0, f - (0.5 - w));
+        float d = abs(fract(v + 0.5) - 0.5);
+        return 1.0 - smoothstep(0.0, w, d);
       }
       void main() {
         vec2 g = vWorld.xz / 4.0;
