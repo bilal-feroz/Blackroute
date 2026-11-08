@@ -58,8 +58,9 @@ export function sentinelOffline(signals: Signal[], matches: Match[]): AgentOutpu
   const strength = Math.min(1, top.score / 6);
   return {
     scenarioId: s.id,
-    confidence: r3(0.45 + strength * 0.45),
-    likelihood: r3(Math.min(0.9, 0.25 + strength * 0.6)),
+    // keyword counting can say a threat is in the news, not how likely it is to hit us
+    confidence: r3(0.4 + strength * 0.4),
+    likelihood: r3(Math.min(0.6, 0.15 + strength * 0.4)),
     headline: `Signals point to: ${s.title}`,
     summary: `${top.signalIds.length} of ${signals.length} signals mention this. ${s.summary}`,
     evidence: top.signalIds.slice(0, 4).map((id) => ({ signalId: id, why: 'mentions the same place and type of disruption' })),
@@ -210,18 +211,18 @@ export function dispatcherOffline(t: ReturnType<typeof dispatcherTools>): AgentO
   const messages: AgentOutput['dispatcher']['messages'] = [];
   const has = (id: string) => t.levers.some((l) => l.id === id);
   if (has('divert_fujairah'))
-    messages.push({ to: 'Shipping line and Fujairah port agent', channel: 'email', subject: 'Request: divert inbound calls to Fujairah', body: `Because of the ${t.disruption}, please divert our inbound vessels from Jebel Ali to Fujairah until further notice. We will arrange trucking from Fujairah to our DCs. Please confirm new ETAs and port charges today.` });
+    messages.push({ to: 'Shipping line and Fujairah port agent', channel: 'email', subject: 'Request: divert inbound calls to Fujairah', body: `Current disruption: ${t.disruption}. Please divert our inbound vessels from Jebel Ali to Fujairah until further notice. We will arrange trucking from Fujairah to our DCs. Please confirm new ETAs and port charges today.` });
   if (has('long_route'))
     messages.push({ to: 'Shipping line', channel: 'email', subject: 'Request: reroute affected sailings', body: `Please reroute our affected sailings via the longer route rather than holding them. Send revised ETAs and any surcharge for approval.` });
   if (has('regional_buy'))
-    messages.push({ to: 'Regional suppliers (Saudi Arabia, Oman)', channel: 'email', subject: 'Urgent order: auto parts and consumer goods', body: `We need daily deliveries of auto parts and consumer goods to our three Dubai and Sharjah DCs while the ${t.disruption} lasts. Please confirm volumes, price and first delivery date.` });
+    messages.push({ to: 'Regional suppliers (Saudi Arabia, Oman)', channel: 'email', subject: 'Urgent order: auto parts and consumer goods', body: `Current disruption: ${t.disruption}. While it lasts we need daily deliveries of auto parts and consumer goods to our three Dubai and Sharjah DCs. Please confirm volumes, price and first delivery date.` });
   if (has('air_freight'))
     messages.push({ to: 'Air cargo forwarder', channel: 'email', subject: 'Book daily air cargo into Al Maktoum (DWC)', body: `Please book daily air freight of electronics into Al Maktoum airport for delivery to Dubai South DC, starting as soon as possible. Send the schedule and rate.` });
   if (has('extra_trucks'))
     messages.push({ to: 'Trucking partner', channel: 'phone', subject: 'Add trucks for the next week', body: `We need about 60% more trucks for port and DC moves from today. Please confirm how many you can add and from when.` });
   if (has('rebalance'))
     messages.push({ to: 'DC managers', channel: 'whatsapp', subject: 'Stock transfers between DCs', body: `We are moving stock between DCs to cover the shortage. Please prepare outbound pallets and expect transfer trucks today.` });
-  messages.push({ to: `Key accounts (${t.keyAccounts.join(', ')})`, channel: 'email', subject: 'Supply update', body: `A ${t.disruption.toLowerCase()} is affecting regional supply. We have a recovery plan in place and expect to keep about ${t.expected.onTimePct}% of deliveries on time. We will update you daily.` });
+  messages.push({ to: `Key accounts (${t.keyAccounts.join(', ')})`, channel: 'email', subject: 'Supply update', body: `Regional supply is disrupted (${t.disruption}). We have a recovery plan in place and expect to keep about ${t.expected.onTimePct}% of your deliveries on time. We will update you daily.` });
   return {
     brief: `${t.disruption}. Approved plan: ${t.approvedPlan}. Expected ${t.expected.onTimePct}% of orders on time at ${aed(t.expected.totalCostAed)} all-in over three weeks.${t.managerNote ? ` Note from ${t.approvedBy}: ${t.managerNote}` : ''}`,
     messages: messages.slice(0, 6),
