@@ -219,11 +219,15 @@ export class LocalBoard implements Board {
     this.yard.castShadow = true;
     this.yard.receiveShadow = true;
     this.yardMax = ordered.length;
+    this.yard.userData.nodeId = 'jebel_ali';
     this.root.add(this.yard);
+    this.pickables.push(this.yard);
 
     const tower = model('port_tower');
     tower.position.set(-30, 0, -36);
+    tower.userData.nodeId = 'jebel_ali';
     this.root.add(tower);
+    this.pickables.push(tower);
     const light = model('lighthouse');
     light.position.set(QUAY_X + 1.5, 0, -44);
     this.root.add(light);
