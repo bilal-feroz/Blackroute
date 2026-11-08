@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+*.tsbuildinfo
+
+# env files (keys stay on your machine)
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# logs
+*.log
+
+# blender backups
+*.blend1

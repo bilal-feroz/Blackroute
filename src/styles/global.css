@@ -1,0 +1,69 @@
+/* BlackRoute design tokens. One dark command-center theme, used everywhere. */
+:root {
+  --bg: #05080f;
+  --bg-2: #0a1020;
+  --panel: rgba(12, 18, 34, 0.72);
+  --panel-solid: #0c1222;
+  --panel-border: rgba(148, 197, 255, 0.12);
+  --panel-border-strong: rgba(148, 197, 255, 0.24);
+  --text: #e6edf7;
+  --text-2: #9aa8bf;
+  --text-3: #64738c;
+
+  --cyan: #22d3ee;
+  --cyan-soft: rgba(34, 211, 238, 0.14);
+  --green: #34d399;
+  --green-soft: rgba(52, 211, 153, 0.14);
+  --amber: #fbbf24;
+  --amber-soft: rgba(251, 191, 36, 0.14);
+  --red: #f43f5e;
+  --red-soft: rgba(244, 63, 94, 0.14);
+  --violet: #a78bfa;
+  --violet-soft: rgba(167, 139, 250, 0.14);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--cyan-soft);
+}
+
+/* thin, quiet scrollbars inside panels */
+.scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 197, 255, 0.18) transparent;
+}
