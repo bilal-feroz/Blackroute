@@ -4,6 +4,7 @@
 //  - Dubai wind, visibility and dust forecast from Open-Meteo (free, no key)
 // Results are cached for 10 minutes so the free APIs are not hammered.
 
+import { limited } from './_lib/guard';
 import { json } from './_lib/llm';
 
 export interface Signal {
@@ -135,8 +136,9 @@ async function weather(): Promise<{ signal: Signal | null; summary: WeatherSumma
   return { signal, summary };
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   if (cache && Date.now() - cache.at < TTL) return json(cache.body);
+  if (limited(request, 20)) return json({ fetchedAt: new Date().toISOString(), signals: [], weather: null, errors: ['Too many requests, please wait a minute.'] }, 429);
   const errors: string[] = [];
   const [n, w] = await Promise.all([
     news()

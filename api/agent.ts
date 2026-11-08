@@ -2,6 +2,7 @@
 // Runs one BlackRoute agent on the configured model. The browser validates the JSON.
 
 import type { AgentId } from '../src/agents/prompts';
+import { limited } from './_lib/guard';
 import { json, provider, runAgent } from './_lib/llm';
 
 const AGENT_IDS: AgentId[] = ['sentinel', 'tracer', 'strategist', 'redteam', 'dispatcher'];
@@ -9,6 +10,7 @@ const MAX_BODY = 60_000;
 
 export async function POST(request: Request): Promise<Response> {
   if (!provider()) return json({ ok: false, offline: true, reason: 'No AI key configured on the server.' });
+  if (limited(request, 30)) return json({ ok: false, error: 'Too many AI requests, please wait a minute.' }, 429);
   const raw = await request.text();
   if (raw.length > MAX_BODY) return json({ ok: false, error: 'Request too large.' }, 413);
   let body: { agent?: string; tools?: unknown; signals?: unknown };
