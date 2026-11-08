@@ -28,3 +28,6 @@ Thumbs.db
 
 # local tool config
 .claude/
+
+# progress workbook holds personal contact details: keep it out of the public repo
+submissions/*Workbook*
