@@ -267,9 +267,11 @@ export const COSTS = {
   airCo2PerPallet: 1450,
   airPalletsPerDay: 26,
   extraTruckFactor: 0.6,
+  /** a ship waiting for a berth or a strait, AED per hour */
+  demurragePerHour: 2200,
   /** regional suppliers in Saudi Arabia and Oman: premium price, trucked in */
   regionalPalletsPerDay: 70,
-  regionalPremiumPerPallet: 1100,
+  regionalPremiumPerPallet: 500,
   regionalCo2PerPallet: 85,
   regionalLeadHours: 60,
   extraTruckPerDay: 9500,

@@ -149,6 +149,8 @@ export interface SimOptions {
   seed?: number;
   /** multiplier on disruption length for this future */
   durationFactor?: number;
+  /** multiplier on customer demand (Red Team demand surge) */
+  demandFactor?: number;
   horizonHours?: number;
   /** keep hourly series and trips for the 3D replay */
   record?: boolean;

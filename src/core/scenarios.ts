@@ -91,7 +91,7 @@ export const SCENARIOS: Scenario[] = [
     title: 'Jebel Ali terminal shutdown',
     kind: 'port_closure',
     target: 'jebel_ali',
-    defaultDays: 3,
+    defaultDays: 4,
     summary: 'A systems outage stops the terminal: no ships unload and no trucks leave.',
     keywords: ['jebel ali outage', 'port cyber attack', 'terminal shutdown', 'port system outage'],
     levers: ['divert_fujairah', 'air_freight', 'rebalance', 'priority'],

@@ -92,7 +92,7 @@ export function simulate(opts: SimOptions = {}): SimRun {
     events.push({ hour, tone, text, node });
   };
 
-  const cost: Record<string, number> = { trucking: 0, rerouting: 0, air: 0, extraTrucks: 0, latePenalties: 0 };
+  const cost: Record<string, number> = { trucking: 0, rerouting: 0, air: 0, extraTrucks: 0, demurrage: 0, latePenalties: 0 };
   let co2 = 0;
 
   // ---------- ships: build the schedule, then apply chokepoint and port effects up front
@@ -413,6 +413,7 @@ export function simulate(opts: SimOptions = {}): SimRun {
 
     // ----- port dispatch rounds
     if (DISPATCH_HOURS.has(h % 24)) {
+      const prioritizeNow = levers.has('priority') && h >= actHour;
       const order = DCS.map((d) => d.id)
         .filter((id) => !dcClosed(id, h))
         .map((id) => {
@@ -423,7 +424,7 @@ export function simulate(opts: SimOptions = {}): SimRun {
           }
           return { id, cover };
         })
-        .sort((a, b) => a.cover - b.cover);
+        .sort((a, b) => (prioritizeNow && HAS_PRIORITY[b.id] !== HAS_PRIORITY[a.id] ? (HAS_PRIORITY[a.id] ? -1 : 1) : a.cover - b.cover));
 
       // in a sandstorm the police keep heavy trucks off the roads at night
       const nightBan = inWin(weather, h) && h % 24 !== 13;
@@ -507,7 +508,7 @@ export function simulate(opts: SimOptions = {}): SimRun {
     if (h % 24 === ORDER_HOUR) {
       for (const c of CUSTOMERS) {
         for (const s of SKU_IDS) {
-          const qty = c.demand[s] * (noisy ? between(rand, 0.85, 1.15) : 1);
+          const qty = c.demand[s] * (opts.demandFactor ?? 1) * (noisy ? between(rand, 0.85, 1.15) : 1);
           if (qty <= 0) continue;
           backlog.push({ customer: c.id, sku: s, qty, hour: h });
           ordered += qty;
@@ -526,7 +527,9 @@ export function simulate(opts: SimOptions = {}): SimRun {
           if (prioritize && (pass === 0) !== cust.priority) continue;
           const dc = servingDc(cust.dc, h);
           if (dcClosed(dc, h)) continue;
-          const have = dcStock[dc][o.sku];
+          // when protecting key accounts, everyone else only gets stock above their reserve
+          const reserve = prioritize && !cust.priority ? PRIORITY_RESERVE[dc][o.sku] : 0;
+          const have = dcStock[dc][o.sku] - reserve;
           if (have <= 0.01) continue;
           const q = Math.min(have, o.qty);
           dcStock[dc][o.sku] -= q;
@@ -597,6 +600,15 @@ export function simulate(opts: SimOptions = {}): SimRun {
 
   cost.latePenalties = latePenalty;
 
+  // demurrage: every hour a ship waits beyond its planned arrival costs money
+  let waitHours = 0;
+  for (const v of vessels) {
+    if (v.plannedEta >= H) continue;
+    const berth = v.berthHour ?? H;
+    waitHours += Math.max(0, berth - v.plannedEta - 12);
+  }
+  cost.demurrage = waitHours * COSTS.demurragePerHour;
+
   let recoveryHours: number | null = 0;
   if (mainStart !== null && lastTroubleHour >= 0) {
     recoveryHours = lastTroubleHour >= H - 6 ? null : Math.max(0, lastTroubleHour - mainStart);
@@ -651,4 +663,13 @@ export function simulate(opts: SimOptions = {}): SimRun {
 }
 
 const CUSTOMER_MAP = Object.fromEntries(CUSTOMERS.map((c) => [c.id, c]));
+const HAS_PRIORITY: Record<string, boolean> = Object.fromEntries(DCS.map((d) => [d.id, CUSTOMERS.some((c) => c.dc === d.id && c.priority)]));
+/** half a day of key-account demand per DC, held back when key accounts come first */
+const PRIORITY_RESERVE: Record<string, Record<SkuId, number>> = Object.fromEntries(
+  DCS.map((d) => {
+    const r: Record<SkuId, number> = { ELEC: 0, AUTO: 0, FMCG: 0 };
+    for (const c of CUSTOMERS) if (c.dc === d.id && c.priority) for (const s of SKU_IDS) r[s] += c.demand[s] * 0.5;
+    return [d.id, r];
+  }),
+);
 const skuName = (s: SkuId) => ({ ELEC: 'electronics', AUTO: 'auto parts', FMCG: 'consumer goods' })[s];
