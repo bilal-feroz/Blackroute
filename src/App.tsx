@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityFeed } from './ui/ActivityFeed';
 import { MissionPanel } from './ui/MissionPanel';
+import { Legend, NodeCard } from './ui/NodeCard';
 import { Timeline } from './ui/Timeline';
 import { TopBar } from './ui/TopBar';
 import { TwinView, resetTwinCamera } from './ui/TwinView';
@@ -111,6 +112,8 @@ export default function App() {
       />
       <ActivityFeed log={m.log} open={logOpen} onClose={() => setLogOpen(false)} />
       <MissionPanel a={a} compare={compare} setCompare={setCompare} onReplay={() => restart(Math.max(0, (m.disruption?.startHour ?? 0) - 4))} />
+      {focus && <NodeCard id={focus} run={run} hour={hour} onClose={() => setFocus(null)} />}
+      <Legend />
       <Timeline run={run} hour={hour} setHour={setHour} playing={playing} setPlaying={setPlaying} speed={speed} setSpeed={setSpeed} label={label} />
     </div>
   );
