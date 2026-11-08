@@ -239,3 +239,28 @@
   background: #5eead4;
   box-shadow: 0 0 8px #5eead4;
 }
+
+/* on phones the warehouse panels shrink to a name and a status dot */
+@media (max-width: 760px) {
+  .tp {
+    min-width: 0;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .tp b {
+    font-size: 10.5px;
+  }
+  .tp > i,
+  .tp-bars {
+    display: none;
+  }
+  .tl {
+    padding: 3px 7px 3px 6px;
+  }
+  .tl b {
+    font-size: 10px;
+  }
+  .tl i {
+    display: none !important;
+  }
+}
