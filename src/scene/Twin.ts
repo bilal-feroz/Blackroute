@@ -44,6 +44,7 @@ export class Twin {
   private raycaster = new THREE.Raycaster();
   private disposed = false;
   private fitted = false;
+  private insets = { top: 0, right: 0, bottom: 0, left: 0 };
   onPick: ((id: string | null) => void) | null = null;
 
   constructor(private container: HTMLElement) {
@@ -168,14 +169,27 @@ export class Twin {
     this.onPick?.((o?.userData.nodeId as string) ?? null);
   };
 
-  /** Distance at which the board (about 180 x 120 units) fills the view. */
+  /** Screen space taken by the interface, so the board is framed in the free area. */
+  setInsets(i: { top?: number; right?: number; bottom?: number; left?: number }) {
+    this.insets = { top: i.top ?? 0, right: i.right ?? 0, bottom: i.bottom ?? 0, left: i.left ?? 0 };
+    this.fitted = false;
+    this.resize();
+  }
+
+  /** Distance at which the board (about 180 x 120 units) fills the free area. */
   private fitDistance(): number {
-    const aspect = this.camera.aspect || 1.6;
-    const vfov = THREE.MathUtils.degToRad(this.camera.fov);
+    const W = this.container.clientWidth || 800;
+    const Hh = this.container.clientHeight || 600;
+    const fh = Hh + Math.abs(this.insets.top - this.insets.bottom);
+    const w = Math.max(200, W - this.insets.left - this.insets.right);
+    const h = Math.max(200, Hh - this.insets.top - this.insets.bottom);
+    const aspect = w / h;
+    // the free area's share of the full vertical field of view
+    const vfov = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(this.camera.fov) / 2) * (h / fh));
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * aspect);
     const needW = 178 / 2 / Math.tan(hfov / 2);
     const needH = 150 / 2 / Math.tan(vfov / 2);
-    return Math.max(needW, needH) * 0.88;
+    return Math.max(needW, needH) * 0.84;
   }
 
   private presetFor(view: TwinView): CameraPreset {
@@ -188,8 +202,16 @@ export class Twin {
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
     if (!w || !h) return;
-    this.camera.aspect = w / h;
     this.camera.fov = 30;
+    // shift the projection centre into the free space beside the panels;
+    // the camera sees a larger virtual view and we show the part we need
+    const dx = (this.insets.left - this.insets.right) / 2;
+    const dy = (this.insets.top - this.insets.bottom) / 2;
+    const fw = w + 2 * Math.abs(dx);
+    const fh = h + 2 * Math.abs(dy);
+    this.camera.aspect = fw / fh;
+    if (dx || dy) this.camera.setViewOffset(fw, fh, Math.abs(dx) - dx, Math.abs(dy) - dy, w, h);
+    else this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
     this.controls.maxDistance = this.fitDistance() * 1.6;
     if (!this.fitted) {
