@@ -20,7 +20,8 @@
     "react-dom": "^19.3.1",
     "three": "^0.187.0",
     "topojson-client": "^3.1.0",
-    "world-atlas": "^2.0.2"
+    "world-atlas": "^2.0.2",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.16",
