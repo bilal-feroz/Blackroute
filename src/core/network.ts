@@ -71,7 +71,7 @@ export const ORIGINS: Origin[] = [
       { chokepoint: 'malacca', hoursBeforeEta: 240 },
       { chokepoint: 'hormuz', hoursBeforeEta: 12 },
     ],
-    cargo: { ELEC: 200, AUTO: 60, FMCG: 120 },
+    cargo: { ELEC: 208, AUTO: 62, FMCG: 125 },
     firstEtaHour: 30,
     vessels: ['Jade Horizon', 'Eastern Lantern', 'Silk Meridian'],
     lane: [
@@ -97,7 +97,7 @@ export const ORIGINS: Origin[] = [
     geo: { lat: 22.74, lon: 69.7 },
     transitHours: 4 * 24,
     route: [{ chokepoint: 'hormuz', hoursBeforeEta: 12 }],
-    cargo: { ELEC: 20, AUTO: 100, FMCG: 260 },
+    cargo: { ELEC: 21, AUTO: 104, FMCG: 270 },
     firstEtaHour: 70,
     vessels: ['Kutch Pioneer', 'Saffron Tide', 'Arabian Courier'],
     lane: [
@@ -121,7 +121,7 @@ export const ORIGINS: Origin[] = [
       { chokepoint: 'bab_el_mandeb', hoursBeforeEta: 120 },
       { chokepoint: 'hormuz', hoursBeforeEta: 12 },
     ],
-    cargo: { ELEC: 60, AUTO: 100, FMCG: 260 },
+    cargo: { ELEC: 62, AUTO: 104, FMCG: 270 },
     firstEtaHour: 110,
     vessels: ['Nordic Crest', 'Maas Voyager', 'Delta Sovereign'],
     lane: [
@@ -155,7 +155,7 @@ export const ORIGINS: Origin[] = [
       { chokepoint: 'malacca', hoursBeforeEta: 228 },
       { chokepoint: 'hormuz', hoursBeforeEta: 12 },
     ],
-    cargo: { ELEC: 120, AUTO: 40, FMCG: 200 },
+    cargo: { ELEC: 125, AUTO: 42, FMCG: 208 },
     firstEtaHour: 150,
     vessels: ['Lion City Spirit', 'Straits Harmony', 'Temasek Bay'],
     lane: [
@@ -219,9 +219,9 @@ export const MAIN_PORT = 'jebel_ali';
 export const ALT_PORT = 'fujairah';
 
 export const DCS: Dc[] = [
-  { id: 'dubai_south', name: 'Dubai South DC', area: 'Dubai South', targetDays: 3, startDays: 2.2, baseLikelihood: 0.04 },
-  { id: 'al_quoz', name: 'Al Quoz DC', area: 'Al Quoz', targetDays: 3, startDays: 2.2, baseLikelihood: 0.04 },
-  { id: 'sharjah', name: 'Sharjah DC', area: 'Sharjah', targetDays: 3, startDays: 2.4, baseLikelihood: 0.04 },
+  { id: 'dubai_south', name: 'Dubai South DC', area: 'Dubai South', targetDays: 3, startDays: 2.1, baseLikelihood: 0.04 },
+  { id: 'al_quoz', name: 'Al Quoz DC', area: 'Al Quoz', targetDays: 3, startDays: 2.1, baseLikelihood: 0.04 },
+  { id: 'sharjah', name: 'Sharjah DC', area: 'Sharjah', targetDays: 3, startDays: 2.3, baseLikelihood: 0.04 },
 ];
 export const DC_BY_ID = Object.fromEntries(DCS.map((d) => [d.id, d])) as Record<string, Dc>;
 
@@ -259,7 +259,7 @@ export const COSTS = {
   /** key accounts have penalty clauses: their late pallet-days cost this much more */
   priorityMultiplier: 2.5,
   /** port stock at the start, in days of total demand */
-  portStartDays: 0.5,
+  portStartDays: 1.0,
   fujairahPerPallet: 210,
   longRoutePerPallet: 140,
   longRouteCo2PerPallet: 95,
