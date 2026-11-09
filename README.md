@@ -46,6 +46,19 @@ flowchart LR
 - **Agents** (`src/agents/`): each agent gets compact tool results from the simulator and must answer in a strict JSON schema (validated with Zod).
 - **Grounding check** (`src/agents/grounding.ts`): every number an agent writes is checked against the tool results it was given. Each report shows whether it came from the AI or the rules and whether it is fully grounded.
 
+## Exam set and baseline
+
+`evals/exam.ts` holds 16 hand-written signal cases (one or more per disruption, mixed feeds, two calm feeds and one prompt-injection headline). `tests/exam.test.ts` also runs the planner on all 10 disruptions. Baseline with the rule-based agents (9 Nov 2026):
+
+| Check | Result |
+|---|---|
+| Sentinel picks the right disruption (or none) | 14 / 16 (88%) |
+| Recommended plan keeps on-time rate at or above doing nothing | 10 / 10 |
+| Recommended plan costs the same or less than doing nothing | 9 / 10 (one plan pays more to reach 100% on time) |
+| Agent reports fully grounded in simulator numbers | 10 / 10 |
+
+The two misses: a terminal shutdown headline that also uses port-congestion words, and the injection headline, which keyword matching cannot tell apart from news. These are the first targets for the AI version of the Sentinel.
+
 ## AI setup
 
 The agents run on **Google Gemini** (free tier) or any **OpenAI-compatible** API (Groq, OpenRouter, OpenAI, a local model). Copy `.env.example` to `.env` and add one key:
@@ -72,6 +85,7 @@ Requires Node 20.19+.
 npm install
 npm run dev     # http://localhost:5173
 npm test        # simulator, planner, radar, red team and agent tests
+npm run exam    # exam set: prints the baseline scores
 npm run build   # static site + /api functions, ready for Vercel
 ```
 
