@@ -17,13 +17,31 @@ export function provider(): Provider | null {
 
 const TIMEOUT_MS = 25_000;
 
-async function withTimeout(url: string, init: RequestInit): Promise<Response> {
+async function once(url: string, init: RequestInit): Promise<Response> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
     return await fetch(url, { ...init, signal: ctrl.signal });
   } finally {
     clearTimeout(t);
+  }
+}
+
+// free tiers often answer 429 or 503 for a moment: try again with a short backoff
+const BACKOFF_MS = [800, 2000];
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function withTimeout(url: string, init: RequestInit): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const last = attempt >= BACKOFF_MS.length;
+    try {
+      const res = await once(url, init);
+      if (last || (res.status !== 429 && res.status < 500)) return res;
+    } catch (e) {
+      // a timeout already took 25 s, so do not wait again
+      if (last || (e as Error).name === 'AbortError') throw e;
+    }
+    await sleep(BACKOFF_MS[attempt] + Math.random() * 300);
   }
 }
 
