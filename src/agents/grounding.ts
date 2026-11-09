@@ -34,13 +34,16 @@ export function checkGrounding(output: unknown, ...sources: unknown[]): Groundin
       if (Math.abs(rawNum) <= 12 && !m[2]) continue;
       checked++;
       const unit = m[2];
-      const candidates = [rawNum];
-      if (unit === 'k' || unit === 'K') candidates.push(rawNum * 1000);
-      if (unit === 'm' || unit === 'M') candidates.push(rawNum * 1_000_000);
-      if (unit === '%') candidates.push(rawNum / 100);
-      const ok = candidates.some((n) =>
+      // "AED 15k" may stand for 14,600: allow half a step of the shown precision
+      const decimals = (m[1].split('.')[1] ?? '').length;
+      const step = 10 ** -decimals;
+      const candidates: { n: number; slack: number }[] = [{ n: rawNum, slack: 0 }];
+      if (unit === 'k' || unit === 'K') candidates.push({ n: rawNum * 1000, slack: (step * 1000) / 2 });
+      if (unit === 'm' || unit === 'M') candidates.push({ n: rawNum * 1_000_000, slack: (step * 1_000_000) / 2 });
+      if (unit === '%') candidates.push({ n: rawNum / 100, slack: 0 });
+      const ok = candidates.some(({ n, slack }) =>
         allowed.some((a) => {
-          const tol = Math.max(0.6, Math.abs(a) * 0.015);
+          const tol = Math.max(0.6, Math.abs(a) * 0.015, slack);
           return Math.abs(a - n) <= tol || Math.abs(a * 100 - n) <= Math.max(0.6, Math.abs(a * 100) * 0.015);
         }),
       );

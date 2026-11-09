@@ -23,6 +23,11 @@ describe('grounding check', () => {
     const g = checkGrounding({ s: 'On time 87.4% and AED 1.05M extra, 640 pallets late' }, { onTimePct: 87.4, cost: 1048000, late: 640 });
     expect(g.ok).toBe(true);
   });
+  test('accepts a rounded amount like "AED 15k" for 14,600', () => {
+    expect(checkGrounding({ s: 'AED 15k extra cost' }, { extraCostAed: 14600 }).ok).toBe(true);
+    expect(checkGrounding({ s: 'AED 1.05M' }, { cost: 1046000 }).ok).toBe(true);
+    expect(checkGrounding({ s: 'AED 17k extra cost' }, { extraCostAed: 14600 }).ok).toBe(false);
+  });
   test('flags numbers the model made up', () => {
     const g = checkGrounding({ s: 'This saves AED 2.4M and 912 pallets' }, { cost: 1048000, late: 640 });
     expect(g.ok).toBe(false);
