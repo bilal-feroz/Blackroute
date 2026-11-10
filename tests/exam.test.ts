@@ -25,7 +25,7 @@ describe('exam set: Sentinel detection (rule-based baseline)', () => {
     console.log(`Sentinel detection: ${pct(correct, rows.length)}`);
     expect(rows.every((r) => r.valid)).toBe(true);
     // the baseline must not get worse
-    expect(correct).toBeGreaterThanOrEqual(13);
+    expect(correct).toBeGreaterThanOrEqual(16);
   });
 });
 
