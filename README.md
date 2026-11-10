@@ -52,12 +52,12 @@ flowchart LR
 
 | Check | Result |
 |---|---|
-| Sentinel picks the right disruption (or none) | 14 / 16 (88%) |
+| Sentinel picks the right disruption (or none) | 14 / 16 (88%) on Day 3, 16 / 16 after the Day 4 fixes |
 | Recommended plan keeps on-time rate at or above doing nothing | 10 / 10 |
 | Recommended plan costs the same or less than doing nothing | 9 / 10 (one plan pays more to reach 100% on time) |
 | Agent reports fully grounded in simulator numbers | 10 / 10 |
 
-The two misses: a terminal shutdown headline that also uses port-congestion words, and the injection headline, which keyword matching cannot tell apart from news. These are the first targets for the AI version of the Sentinel.
+The two Day 3 misses were a terminal shutdown headline that also uses port-congestion words, and a prompt-injection headline. Day 4 fixed both: a keyword gap was closed, and headlines that give orders to the AI are now dropped before matching and before the model sees them. Identical agent requests are cached, and the AI call retries with backoff on 429 and 5xx errors.
 
 ## AI setup
 
