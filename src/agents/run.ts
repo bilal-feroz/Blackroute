@@ -13,7 +13,14 @@ export interface AgentReport<K extends AgentId = AgentId> {
   grounding: Grounding;
   note?: string;
   ms: number;
+  /** answer reused from an identical earlier request */
+  cached?: boolean;
 }
+
+// Same agent + same tool results = same answer, so reuse it instead of
+// spending another call against the free-tier rate limit.
+const CACHE_MAX = 40;
+const cache = new Map<string, { out: unknown; model?: string }>();
 
 export interface AiStatus {
   provider: string;
@@ -56,6 +63,12 @@ export async function askAgent<K extends AgentId>(
     return { agent, out, source: 'rules', grounding: checkGrounding(out, tools, signals), note, ms: performance.now() - t0 };
   };
   if (!useAi) return fallback();
+  const key = `${agent}:${JSON.stringify([tools, signals])}`;
+  const hit = cache.get(key);
+  if (hit) {
+    const out = hit.out as AgentOutput[K];
+    return { agent, out, source: 'ai', model: hit.model, grounding: checkGrounding(out, tools, signals), ms: performance.now() - t0, cached: true };
+  }
   try {
     const res = await fetch('/api/agent', {
       method: 'POST',
@@ -67,6 +80,8 @@ export async function askAgent<K extends AgentId>(
     const parsed = OUTPUT[agent].safeParse(extractJson(body.text));
     if (!parsed.success) return fallback('The AI answer did not match the required format. Used the rule-based report.');
     const out = parsed.data as AgentOutput[K];
+    if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value!);
+    cache.set(key, { out, model: body.model });
     return { agent, out, source: 'ai', model: body.model, grounding: checkGrounding(out, tools, signals), ms: performance.now() - t0 };
   } catch {
     return fallback('Could not reach the AI service. Used the rule-based report.');
