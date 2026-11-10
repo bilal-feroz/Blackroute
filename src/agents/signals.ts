@@ -33,13 +33,25 @@ export interface Match {
   signalIds: string[];
 }
 
+// Headlines that talk to the AI instead of reporting news (prompt injection).
+const INJECTION = [
+  /\b(ignore|disregard|forget|override)\b[^.]{0,40}\b(rules?|instructions?|prompts?|guidelines)\b/i,
+  /\b(system prompt|you are now|pretend to be|new instructions)\b/i,
+];
+
+/** True when a headline reads like an instruction to the model, not news. */
+export function isSuspicious(title: string): boolean {
+  return INJECTION.some((r) => r.test(title));
+}
+
 /** Keyword match of signals to known scenarios: the Sentinel's first tool. */
 export function matchSignals(signals: Signal[]): Match[] {
   const out: Match[] = [];
+  const clean = signals.filter((s) => !isSuspicious(s.title));
   for (const s of SCENARIOS) {
     const ids: string[] = [];
     let score = 0;
-    for (const sig of signals) {
+    for (const sig of clean) {
       const t = sig.title.toLowerCase();
       const hits = s.keywords.filter((k) => t.includes(k)).length;
       if (hits) {

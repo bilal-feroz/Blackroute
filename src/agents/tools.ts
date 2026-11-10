@@ -8,7 +8,7 @@ import { SCENARIOS, SCENARIO_BY_ID, type Scenario } from '../core/scenarios';
 import type { Metrics, SimRun } from '../core/types';
 import { aed, dayTime, days, pct } from '../core/format';
 import type { AgentOutput } from './prompts';
-import type { Match, Signal } from './signals';
+import { isSuspicious, type Match, type Signal } from './signals';
 
 const r0 = (n: number) => Math.round(n);
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -38,8 +38,12 @@ export function sentinelTools(matches: Match[]) {
   };
 }
 
+/** Cleaned signals for the model: injection-like headlines dropped, text trimmed. */
 export function sentinelSignals(signals: Signal[]) {
-  return signals.slice(0, 18).map((s) => ({ id: s.id, title: s.title, source: s.source, published: s.publishedAt.slice(0, 10) }));
+  return signals
+    .filter((s) => !isSuspicious(s.title))
+    .slice(0, 18)
+    .map((s) => ({ id: s.id, title: s.title.replace(/\s+/g, ' ').trim().slice(0, 200), source: s.source.slice(0, 60), published: s.publishedAt.slice(0, 10) }));
 }
 
 export function sentinelOffline(signals: Signal[], matches: Match[]): AgentOutput['sentinel'] {
