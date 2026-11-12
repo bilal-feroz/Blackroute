@@ -2,6 +2,7 @@
 // Shared by the server function (to brief the model) and the browser (to validate).
 
 import { z } from 'zod';
+import { SCENARIOS } from '../core/scenarios';
 
 export type AgentId = 'sentinel' | 'tracer' | 'strategist' | 'redteam' | 'dispatcher';
 
@@ -59,39 +60,45 @@ These are drafts for a human to review and send. Keep each message under 90 word
 
 // ---- output schemas (validated in the browser; also sent to Gemini as responseSchema)
 
+// The Sentinel may only name a scenario we can simulate, or 'none'.
+export const SCENARIO_IDS = ['none', ...SCENARIOS.map((s) => s.id)] as [string, ...string[]];
+// Length caps keep a runaway answer from flooding the screen or the token budget.
+const short = z.string().min(1).max(200);
+const text = z.string().min(1).max(700);
+
 export const SentinelOut = z.object({
-  scenarioId: z.string(),
+  scenarioId: z.enum(SCENARIO_IDS),
   confidence: z.number().min(0).max(1),
   likelihood: z.number().min(0).max(1),
-  headline: z.string(),
-  summary: z.string(),
-  evidence: z.array(z.object({ signalId: z.string(), why: z.string() })).max(6),
+  headline: short,
+  summary: text,
+  evidence: z.array(z.object({ signalId: short, why: text })).max(6),
 });
 export const TracerOut = z.object({
-  headline: z.string(),
-  summary: z.string(),
-  affected: z.array(z.object({ place: z.string(), impact: z.string() })).max(8),
-  firstShortage: z.string(),
+  headline: short,
+  summary: text,
+  affected: z.array(z.object({ place: short, impact: text })).max(8),
+  firstShortage: text,
 });
 export const StrategistOut = z.object({
-  headline: z.string(),
-  recommendation: z.string(),
-  why: z.array(z.string()).max(5),
-  tradeoffs: z.array(z.string()).max(5),
-  whyNotRunnerUp: z.string(),
+  headline: short,
+  recommendation: text,
+  why: z.array(text).max(5),
+  tradeoffs: z.array(text).max(5),
+  whyNotRunnerUp: text,
 });
 export const RedTeamOut = z.object({
   verdict: z.enum(['robust', 'mostly robust', 'fragile']),
-  summary: z.string(),
-  concerns: z.array(z.object({ title: z.string(), detail: z.string(), severity: z.enum(['low', 'medium', 'high']) })).max(6),
-  safeguards: z.array(z.string()).max(5),
+  summary: text,
+  concerns: z.array(z.object({ title: short, detail: text, severity: z.enum(['low', 'medium', 'high']) })).max(6),
+  safeguards: z.array(text).max(5),
 });
 export const DispatcherOut = z.object({
-  brief: z.string(),
+  brief: text,
   messages: z
-    .array(z.object({ to: z.string(), channel: z.enum(['email', 'whatsapp', 'phone']), subject: z.string(), body: z.string() }))
+    .array(z.object({ to: short, channel: z.enum(['email', 'whatsapp', 'phone']), subject: short, body: z.string().min(1).max(1500) }))
     .max(6),
-  checklist: z.array(z.string()).max(8),
+  checklist: z.array(text).max(8),
 });
 
 export const OUTPUT = {
@@ -117,7 +124,7 @@ const arr = (items: object) => ({ type: 'ARRAY', items });
 const obj = (properties: Record<string, object>, required = Object.keys(properties)) => ({ type: 'OBJECT', properties, required });
 
 export const RESPONSE_SCHEMA: Record<AgentId, object> = {
-  sentinel: obj({ scenarioId: S, confidence: N, likelihood: N, headline: S, summary: S, evidence: arr(obj({ signalId: S, why: S })) }),
+  sentinel: obj({ scenarioId: { type: 'STRING', enum: SCENARIO_IDS }, confidence: N, likelihood: N, headline: S, summary: S, evidence: arr(obj({ signalId: S, why: S })) }),
   tracer: obj({ headline: S, summary: S, affected: arr(obj({ place: S, impact: S })), firstShortage: S }),
   strategist: obj({ headline: S, recommendation: S, why: arr(S), tradeoffs: arr(S), whyNotRunnerUp: S }),
   redteam: obj({
