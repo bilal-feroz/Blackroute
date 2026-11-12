@@ -21,6 +21,10 @@ export async function POST(request: Request): Promise<Response> {
   }
   const agent = body.agent as AgentId;
   if (!AGENT_IDS.includes(agent)) return json({ ok: false, error: 'Unknown agent.' }, 400);
+  // tool results must be an object; signals, when sent, a short list
+  const tools = body.tools;
+  if (!tools || typeof tools !== 'object' || Array.isArray(tools)) return json({ ok: false, error: 'Tool results missing.' }, 400);
+  if (body.signals != null && (!Array.isArray(body.signals) || body.signals.length > 18)) return json({ ok: false, error: 'Bad signal list.' }, 400);
   try {
     const out = await runAgent(agent, body.tools ?? {}, body.signals ?? null);
     return json({ ok: true, ...out });
