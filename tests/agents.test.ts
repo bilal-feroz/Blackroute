@@ -46,6 +46,20 @@ describe('injection filter', () => {
   });
 });
 
+describe('output guardrails', () => {
+  const ok = { scenarioId: 'hormuz_closure', confidence: 0.7, likelihood: 0.4, headline: 'Hormuz', summary: 'Signals point to Hormuz.', evidence: [] };
+  test('accepts a known scenario', () => {
+    expect(OUTPUT.sentinel.safeParse(ok).success).toBe(true);
+  });
+  test('rejects a scenario the simulator does not know', () => {
+    expect(OUTPUT.sentinel.safeParse({ ...ok, scenarioId: 'alien_invasion' }).success).toBe(false);
+  });
+  test('rejects runaway or empty text', () => {
+    expect(OUTPUT.sentinel.safeParse({ ...ok, summary: 'x'.repeat(5000) }).success).toBe(false);
+    expect(OUTPUT.sentinel.safeParse({ ...ok, headline: '' }).success).toBe(false);
+  });
+});
+
 describe('Sentinel', () => {
   test('replay signals for Hormuz point to the Hormuz scenario', () => {
     const feed = replayFeed('hormuz_closure');
