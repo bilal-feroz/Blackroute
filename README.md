@@ -76,6 +76,9 @@ Keys are read only by the server functions in `/api` and never reach the browser
 - Text from the internet is passed to the model as untrusted data, never as instructions.
 - Nothing is sent or executed automatically. The Dispatcher only drafts messages for a human to review.
 - AI and signal endpoints are rate-limited per visitor, and request sizes are capped.
+- Headlines that try to give orders to the AI are dropped before the model sees them.
+- Every AI answer must match a strict schema: the Sentinel can only name a scenario the simulator knows, and text fields have length limits. Anything else falls back to the rule-based report.
+- Security headers (no framing, no sniffing, no camera or location access) are set in `vercel.json`, and API responses are never cached.
 
 ## Run it
 
