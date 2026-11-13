@@ -2,6 +2,8 @@
 
 **Find the weak routes before they go dark.**
 
+**Live app:** https://blackroute-iota.vercel.app
+
 BlackRoute is an agentic AI control tower for logistics. It breaks every link of a supply network on purpose in a simulator to find the weakest ones, watches live news and weather for threats to them, and uses a team of AI agents to trace the impact, plan a recovery and stress-test it. A human always makes the final call.
 
 > **AI finds the problem. The simulator checks the plan. A human decides.**
