@@ -1,6 +1,6 @@
 // The disruptions BlackRoute knows how to model. The Sentinel agent maps live
 // signals onto these, and an operator can also trigger them by hand.
-import type { Disruption, DisruptionKind, LeverId } from './types';
+import type { Disruption, DisruptionKind, LeverId } from './types.js';
 
 export interface Scenario {
   id: string;

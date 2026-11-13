@@ -2,7 +2,7 @@
 // Shared by the server function (to brief the model) and the browser (to validate).
 
 import { z } from 'zod';
-import { SCENARIOS } from '../core/scenarios';
+import { SCENARIOS } from '../core/scenarios.js';
 
 export type AgentId = 'sentinel' | 'tracer' | 'strategist' | 'redteam' | 'dispatcher';
 

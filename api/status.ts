@@ -1,5 +1,5 @@
 // GET /api/status -> which AI provider is configured (never the key itself).
-import { json, provider } from './_lib/llm';
+import { json, provider } from './_lib/llm.js';
 
 export async function GET(): Promise<Response> {
   const p = provider();

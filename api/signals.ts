@@ -4,8 +4,8 @@
 //  - Dubai wind, visibility and dust forecast from Open-Meteo (free, no key)
 // Results are cached for 10 minutes so the free APIs are not hammered.
 
-import { limited } from './_lib/guard';
-import { json } from './_lib/llm';
+import { limited } from './_lib/guard.js';
+import { json } from './_lib/llm.js';
 
 export interface Signal {
   id: string;

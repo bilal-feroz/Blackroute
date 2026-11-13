@@ -1,9 +1,9 @@
 // POST /api/agent  { agent, tools, signals? }  ->  { ok, text, model, provider } | { ok: false, offline }
 // Runs one BlackRoute agent on the configured model. The browser validates the JSON.
 
-import type { AgentId } from '../src/agents/prompts';
-import { limited } from './_lib/guard';
-import { json, provider, runAgent } from './_lib/llm';
+import type { AgentId } from '../src/agents/prompts.js';
+import { limited } from './_lib/guard.js';
+import { json, provider, runAgent } from './_lib/llm.js';
 
 const AGENT_IDS: AgentId[] = ['sentinel', 'tracer', 'strategist', 'redteam', 'dispatcher'];
 const MAX_BODY = 60_000;

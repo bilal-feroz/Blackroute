@@ -2,7 +2,7 @@
 // sent to the browser. Supports Google Gemini and any OpenAI-compatible API
 // (Groq, OpenRouter, OpenAI, a local model...).
 
-import { AGENTS, RESPONSE_SCHEMA, SHARED_RULES, schemaHint, type AgentId } from '../../src/agents/prompts';
+import { AGENTS, RESPONSE_SCHEMA, SHARED_RULES, schemaHint, type AgentId } from '../../src/agents/prompts.js';
 
 export interface Provider {
   name: 'gemini' | 'openai-compatible';
