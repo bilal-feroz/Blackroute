@@ -121,6 +121,9 @@ export class Twin {
     this.resizeObs.observe(container);
     this.renderer.domElement.addEventListener('pointerup', this.handlePointer);
     this.renderer.domElement.addEventListener('pointerdown', this.handleDown);
+    this.renderer.domElement.addEventListener('pointermove', this.handleMove);
+    this.renderer.domElement.addEventListener('pointerleave', this.handleLeave);
+    this.labels.domElement.addEventListener('click', this.handleLabelClick);
     if (import.meta.env.DEV) (window as unknown as { __twin: Twin }).__twin = this;
   }
 
@@ -168,6 +171,48 @@ export class Twin {
     while (o && !o.userData.nodeId) o = o.parent;
     this.onPick?.((o?.userData.nodeId as string) ?? null);
   };
+
+  // ---------------------------------------------------------------- hover
+  private hoverNdc: THREE.Vector2 | null = null;
+  private hoverDirty = false;
+  private hovered: string | null = null;
+
+  private handleMove = (e: PointerEvent) => {
+    if (e.buttons) return; // orbiting, not hovering
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.hoverNdc = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+    this.hoverDirty = true;
+  };
+
+  private handleLeave = () => {
+    this.hoverNdc = null;
+    this.hoverDirty = true;
+  };
+
+  /** Clicking a label or chip opens that node, like clicking its building. */
+  private handleLabelClick = (e: MouseEvent) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-node]');
+    if (el?.dataset.node) this.onPick?.(el.dataset.node);
+  };
+
+  /** Raycast at most once a frame and light up the labels of the building under the pointer. */
+  private updateHover() {
+    if (!this.hoverDirty) return;
+    this.hoverDirty = false;
+    let id: string | null = null;
+    const board = this.boards[this.currentView];
+    if (this.hoverNdc && board && !this.fly) {
+      this.raycaster.setFromCamera(this.hoverNdc, this.camera);
+      let o: THREE.Object3D | null = this.raycaster.intersectObjects(board.pickables, true)[0]?.object ?? null;
+      while (o && !o.userData.nodeId) o = o.parent;
+      id = (o?.userData.nodeId as string) ?? null;
+    }
+    if (id === this.hovered) return;
+    this.hovered = id;
+    for (const el of this.labels.domElement.querySelectorAll('.hovered')) el.classList.remove('hovered');
+    if (id) for (const el of this.labels.domElement.querySelectorAll(`[data-node="${CSS.escape(id)}"]`)) el.classList.add('hovered');
+    this.renderer.domElement.style.cursor = id ? 'pointer' : '';
+  }
 
   /** Screen space taken by the interface, so the board is framed in the free area. */
   setInsets(i: { top?: number; right?: number; bottom?: number; left?: number }) {
@@ -244,10 +289,12 @@ export class Twin {
       this.fade = Math.abs(k - 0.5) * 2;
       if (this.fly.t >= 1) this.fly = null;
     }
-    this.renderer.toneMappingExposure = 0.45 + 0.55 * this.fade;
+    // a soft dip while the boards swap; a deep fade looks like a grey flash on a white page
+    this.renderer.toneMappingExposure = 0.8 + 0.2 * this.fade;
 
     for (const b of Object.values(this.boards)) if (b && b.root.visible) b.update(this.state, dt);
     this.controls.update();
+    this.updateHover();
     this.composer.render();
     this.labels.render(this.scene, this.camera);
   };
@@ -258,6 +305,9 @@ export class Twin {
     this.resizeObs.disconnect();
     this.renderer.domElement.removeEventListener('pointerup', this.handlePointer);
     this.renderer.domElement.removeEventListener('pointerdown', this.handleDown);
+    this.renderer.domElement.removeEventListener('pointermove', this.handleMove);
+    this.renderer.domElement.removeEventListener('pointerleave', this.handleLeave);
+    this.labels.domElement.removeEventListener('click', this.handleLabelClick);
     for (const b of Object.values(this.boards)) b?.dispose();
     this.controls.dispose();
     this.composer.dispose();
