@@ -44,7 +44,9 @@ export function checkGrounding(output: unknown, ...sources: unknown[]): Groundin
       const ok = candidates.some(({ n, slack }) =>
         allowed.some((a) => {
           const tol = Math.max(0.6, Math.abs(a) * 0.015, slack);
-          return Math.abs(a - n) <= tol || Math.abs(a * 100 - n) <= Math.max(0.6, Math.abs(a * 100) * 0.015);
+          // "AED 51k more" may be written for a saving of -51,503
+          const mag = Math.abs(a);
+          return Math.abs(a - n) <= tol || Math.abs(mag - n) <= tol || Math.abs(a * 100 - n) <= Math.max(0.6, Math.abs(a * 100) * 0.015);
         }),
       );
       if (!ok) unsupported.push(m[0].trim());
