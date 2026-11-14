@@ -1,4 +1,4 @@
-// The 3D view: renderer, bloom, labels, camera and the two boards
+// The 3D view: renderer, light bloom, labels, camera and the two boards
 // (local digital twin of Dubai and the global shipping corridor).
 
 import * as THREE from 'three';
@@ -55,7 +55,7 @@ export class Twin {
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(w, h);
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMapping = THREE.NeutralToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
@@ -83,19 +83,19 @@ export class Twin {
     this.controls.rotateSpeed = 0.6;
     this.controls.zoomSpeed = 0.8;
 
-    // the page behind the canvas carries the slate-blue gradient
+    // the page behind the canvas carries the soft daylight gradient
     this.scene.background = null;
     const pmrem = new THREE.PMREMGenerator(this.renderer);
     this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    this.scene.environmentIntensity = 0.55;
+    this.scene.environmentIntensity = 0.4;
 
-    // soft dusk light: cool sky, warm key light, blue fill
-    const hemi = new THREE.HemisphereLight('#dfe9ff', '#3c4554', 1.05);
+    // soft daylight: white sky, warm sun, cool fill
+    const hemi = new THREE.HemisphereLight('#ffffff', '#b9beb4', 0.95);
     this.scene.add(hemi);
-    const fill = new THREE.DirectionalLight('#8fb3ff', 0.55);
+    const fill = new THREE.DirectionalLight('#e6efff', 0.6);
     fill.position.set(90, 60, -70);
     this.scene.add(fill);
-    const moon = new THREE.DirectionalLight('#fff1dc', 2.0);
+    const moon = new THREE.DirectionalLight('#fff6e8', 1.9);
     moon.position.set(-60, 120, 70);
     moon.castShadow = true;
     moon.shadow.mapSize.set(2048, 2048);
@@ -112,7 +112,7 @@ export class Twin {
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.42, 0.4, 0.96);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.05, 0.2, 0.995);
     this.composer.addPass(this.bloom);
     this.composer.addPass(new OutputPass());
 
