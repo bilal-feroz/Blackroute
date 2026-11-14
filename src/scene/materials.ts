@@ -1,19 +1,19 @@
-// Shader materials for the digital twin, in the BlackRoute concept-art style:
-// teal "digital" water, a fine survey grid on slate concrete, soft data-flow
-// lines that run teal to lime, and calm status markers.
+// Shader materials for the digital twin in daylight: a light sea with fine
+// survey traces, a pencil grid on pale concrete, solid data-flow bands that
+// read on white, and calm status markers. The black route is drawn in ink.
 
 import * as THREE from 'three';
 
 export const PALETTE = {
-  teal: new THREE.Color('#2dd4bf'),
-  cyan: new THREE.Color('#38bdf8'),
-  green: new THREE.Color('#4ade80'),
-  lime: new THREE.Color('#a3e635'),
-  amber: new THREE.Color('#fbbf24'),
-  orange: new THREE.Color('#fb923c'),
-  red: new THREE.Color('#f43f5e'),
-  violet: new THREE.Color('#a78bfa'),
-  white: new THREE.Color('#f1f5f9'),
+  teal: new THREE.Color('#0d9488'),
+  cyan: new THREE.Color('#0284c7'),
+  green: new THREE.Color('#16a34a'),
+  lime: new THREE.Color('#65a30d'),
+  amber: new THREE.Color('#d97706'),
+  orange: new THREE.Color('#ea580c'),
+  red: new THREE.Color('#dc2626'),
+  violet: new THREE.Color('#1f2328'),
+  white: new THREE.Color('#f8fafc'),
 };
 
 export type Tone = 'normal' | 'risk' | 'down' | 'recovery' | 'muted' | 'radar';
@@ -30,9 +30,9 @@ export function toneColors(t: Tone): [THREE.Color, THREE.Color] {
     case 'recovery':
       return [PALETTE.green, PALETTE.amber];
     case 'radar':
-      return [PALETTE.violet, PALETTE.red];
+      return [PALETTE.violet, PALETTE.orange];
     default:
-      return [new THREE.Color('#64748b'), new THREE.Color('#94a3b8')];
+      return [new THREE.Color('#9ca3af'), new THREE.Color('#c4c8c2')];
   }
 }
 
@@ -46,9 +46,9 @@ export function waterMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     uniforms: {
       uTime: sharedTime,
-      uDeep: { value: new THREE.Color('#0b3b45') },
-      uShallow: { value: new THREE.Color('#0f5f62') },
-      uLine: { value: new THREE.Color('#5eead4') },
+      uDeep: { value: new THREE.Color('#5d9ea7') },
+      uShallow: { value: new THREE.Color('#8cc5c6') },
+      uLine: { value: new THREE.Color('#ffffff') },
       uQuayX: { value: -40 },
       uTrace: { value: 1 },
       uTraceScale: { value: 1.6 },
@@ -80,18 +80,18 @@ export function waterMaterial(): THREE.ShaderMaterial {
         float d = clamp((uQuayX - vWorld.x) / 26.0, 0.0, 1.0);
         vec3 col = mix(uShallow, uDeep, d * 0.85);
         float swell = sin(vWorld.z * 0.22 + uTime * 0.7) * sin(vWorld.x * 0.15 - uTime * 0.5);
-        col *= 0.92 + 0.08 * swell;
+        col *= 0.96 + 0.04 * swell;
         // circuit-board traces in the water, like the concept art
         vec2 g = vWorld.xz / uTraceScale;
         vec2 cell = floor(g);
         float on = step(0.7, hash(cell));
         float trace = max(line(g.x, 0.025) * step(0.5, hash(cell + 7.0)), line(g.y, 0.025) * step(0.5, hash(cell + 3.0))) * on;
         float spark = smoothstep(0.94, 1.0, fract(hash(cell) * 9.0 + uTime * 0.2));
-        col += uLine * trace * (0.12 + spark * 0.5) * uTrace;
+        col = mix(col, uLine, trace * (0.25 + spark * 0.45) * uTrace);
         vec2 f = fract(g) - 0.5;
-        col += uLine * on * smoothstep(0.08, 0.0, length(f)) * 0.25 * uTrace;
+        col = mix(col, uLine, on * smoothstep(0.08, 0.0, length(f)) * 0.5 * uTrace);
         // light glow along the quay
-        col += uLine * exp(-max(0.0, uQuayX - vWorld.x) * 0.5) * 0.25;
+        col = mix(col, uLine, exp(-max(0.0, uQuayX - vWorld.x) * 0.5) * 0.35);
         gl_FragColor = vec4(col, 1.0);
       }
     `,
@@ -105,7 +105,7 @@ export function gridMaterial(): THREE.ShaderMaterial {
     depthWrite: false,
     uniforms: {
       uTime: sharedTime,
-      uColor: { value: new THREE.Color('#c7d2df') },
+      uColor: { value: new THREE.Color('#6b7268') },
     },
     vertexShader: /* glsl */ `
       varying vec3 vWorld;
@@ -128,7 +128,7 @@ export function gridMaterial(): THREE.ShaderMaterial {
         float minor = max(line(g.x, 0.018), line(g.y, 0.018));
         vec2 G = vWorld.xz / 20.0;
         float major = max(line(G.x, 0.01), line(G.y, 0.01));
-        float a = minor * 0.06 + major * 0.14;
+        float a = minor * 0.07 + major * 0.16;
         gl_FragColor = vec4(uColor, a);
       }
     `,
@@ -145,7 +145,7 @@ export function flowMaterial(tone: Tone = 'normal', opts: { speed?: number; opac
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     uniforms: {
       uTime: sharedTime,
       uColor: { value: a.clone() },
@@ -177,9 +177,10 @@ export function flowMaterial(tone: Tone = 'normal', opts: { speed?: number; opac
         float p = fract(vUv.x * uDashes - uTime * uSpeed * uDashes * 0.25);
         float streak = smoothstep(0.0, 0.25, p) * (1.0 - smoothstep(0.45, 0.8, p));
         float ends = smoothstep(0.0, 0.04, vUv.x) * smoothstep(1.0, 0.96, vUv.x);
-        float glow = (0.35 + streak * 0.9) * core * ends;
+        float glow = (0.5 + streak * 0.5) * core * ends;
         vec3 col = mix(uColor, uColorB, vUv.x);
-        gl_FragColor = vec4(col * uIntensity * glow, glow * uOpacity);
+        col = mix(col, vec3(1.0), streak * 0.35);
+        gl_FragColor = vec4(col, clamp(glow * 1.25, 0.0, 1.0) * uOpacity);
       }
     `,
   });
@@ -191,7 +192,7 @@ export function ringMaterial(tone: Tone = 'normal'): THREE.ShaderMaterial {
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     uniforms: {
       uTime: sharedTime,
       uColor: { value: toneColor(tone).clone() },
@@ -216,7 +217,7 @@ export function ringMaterial(tone: Tone = 'normal'): THREE.ShaderMaterial {
         float ripple = uPulse * smoothstep(wave - 0.08, wave, r) * (1.0 - smoothstep(wave, wave + 0.02, r)) * (1.0 - wave);
         float fill = (1.0 - r) * 0.08 * uPulse;
         float a = rim * 0.8 + ripple * 0.8 + fill;
-        gl_FragColor = vec4(uColor * uIntensity * a, a);
+        gl_FragColor = vec4(uColor, clamp(a, 0.0, 1.0));
       }
     `,
   });
@@ -228,7 +229,7 @@ export function beamMaterial(tone: Tone = 'normal'): THREE.ShaderMaterial {
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     uniforms: {
       uTime: sharedTime,
       uColor: { value: toneColor(tone).clone() },
@@ -246,8 +247,8 @@ export function beamMaterial(tone: Tone = 'normal'): THREE.ShaderMaterial {
       void main() {
         float fade = pow(1.0 - vUv.y, 2.2);
         float flicker = 0.85 + 0.15 * sin(uTime * 3.0 + vUv.y * 12.0);
-        float a = fade * flicker * 0.45;
-        gl_FragColor = vec4(uColor * uIntensity * a, a);
+        float a = fade * flicker * 0.32;
+        gl_FragColor = vec4(uColor, a);
       }
     `,
   });
@@ -265,7 +266,7 @@ export function windowTexture(seed = 1, warm = true): THREE.CanvasTexture {
   c.width = 64;
   c.height = 128;
   const g = c.getContext('2d')!;
-  g.fillStyle = '#20262f';
+  g.fillStyle = '#eceeea';
   g.fillRect(0, 0, c.width, c.height);
   let s = seed * 9301 + 49297;
   const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
@@ -273,12 +274,12 @@ export function windowTexture(seed = 1, warm = true): THREE.CanvasTexture {
     for (let x = 4; x < c.width - 4; x += 6) {
       const r = rnd();
       if (r < 0.5) {
-        g.fillStyle = 'rgba(120,140,165,0.35)';
+        g.fillStyle = 'rgba(150,170,185,0.55)';
         g.fillRect(x, y, 3, 3);
         continue;
       }
       const lum = 0.45 + rnd() * 0.55;
-      const col = warm ? (r > 0.92 ? [180, 225, 255] : [255, 190, 105]) : [170, 215, 255];
+      const col = warm ? (r > 0.92 ? [120, 160, 190] : [140, 165, 182]) : [110, 150, 180];
       g.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${lum})`;
       g.fillRect(x, y, 3, 3);
     }
