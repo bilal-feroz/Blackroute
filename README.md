@@ -26,7 +26,7 @@ Everything that moves is a replay of the simulator. Nothing is decoration.
 | **Investigate** | The **Tracer** agent simulates three weeks of doing nothing: which ships are held, which DC runs out first, which customers wait, what it costs. |
 | **Plan** | The **Strategist** agent tests every useful combination of seven recovery levers across 20 random futures each (slow ships, demand swings, a disruption that runs short or long) and ranks them for four goals: balanced, cheapest, fastest and greenest. It also shows the **cost of waiting** a day or three before acting. |
 | **Decide** | The **Red Team** agent tries to break the chosen plan: a longer disruption, a demand surge, a second shock, a late start and the unluckiest future. Then a human approves, rejects or picks another plan. |
-| **Recover** | The **Dispatcher** agent turns the approved plan into ready-to-send drafts (shipping line, port agent, suppliers, key accounts) and a checklist. The twin replays the disruption with the plan, next to doing nothing. |
+| **Recover** | The **Dispatcher** agent turns the approved plan into ready-to-send drafts (shipping line, port agent, suppliers, key accounts) and a checklist. The twin replays the disruption with the plan, next to doing nothing, and the whole decision downloads as an action pack (Markdown or JSON) with an audit trail. |
 
 ## How it works
 
@@ -61,15 +61,27 @@ flowchart LR
 
 The two Day 3 misses were a terminal shutdown headline that also uses port-congestion words, and a prompt-injection headline. Day 4 fixed both: a keyword gap was closed, and headlines that give orders to the AI are now dropped before matching and before the model sees them. Identical agent requests are cached, and the AI call retries with backoff on 429 and 5xx errors.
 
+**Live AI run** (`npm run exam:live`, Groq `openai/gpt-oss-120b`, 14 Nov 2026):
+
+| Check | Result |
+|---|---|
+| Sentinel picks the right disruption (or none) | 16 / 16 (first run 14 / 16, fixed by giving it each scenario's place names) |
+| Sentinel response time | median 1.2 s on the free tier |
+| Tracer and Strategist reports valid JSON | 10 / 10 |
+| Tracer and Strategist reports fully grounded | 7 / 10: the other 3 contain a number the model added up itself, and the grounding check flags it on screen |
+
+Every agent report also has thumbs up and down, kept in the browser, to see which answers help.
+
 Full write-ups: [evaluation dataset and results](submissions/BlackRoute_Evaluation_Dataset_and_Results.pdf) and the [final progress report](submissions/BlackRoute_Final_Report.pdf).
 
 ## AI setup
 
-The agents run on **Google Gemini** (free tier) or any **OpenAI-compatible** API (Groq, OpenRouter, OpenAI, a local model). Copy `.env.example` to `.env` and add one key:
+The agents run on any **OpenAI-compatible** API (the live app uses Groq with `openai/gpt-oss-120b` and strict JSON schemas) or on **Google Gemini**. Copy `.env.example` to `.env` and add one key:
 
 ```bash
-GEMINI_API_KEY=your-key        # https://aistudio.google.com/apikey
-GEMINI_MODEL=gemini-2.5-flash
+OPENAI_COMPAT_API_KEY=your-key   # https://console.groq.com/keys
+OPENAI_COMPAT_MODEL=openai/gpt-oss-120b
+# or: GEMINI_API_KEY=your-key  (https://aistudio.google.com/apikey)
 ```
 
 Keys are read only by the server functions in `/api` and never reach the browser. **Without a key, BlackRoute still works**: each agent writes its report from rules, using the same simulator numbers. The top bar shows which mode is on.
@@ -93,6 +105,7 @@ npm install
 npm run dev     # http://localhost:5173
 npm test        # simulator, planner, radar, red team and agent tests
 npm run exam    # exam set: prints the baseline scores
+npm run exam:live  # same exam on the live AI model (needs a key)
 npm run build   # static site + /api functions, ready for Vercel
 ```
 
