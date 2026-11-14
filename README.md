@@ -61,6 +61,8 @@ flowchart LR
 
 The two Day 3 misses were a terminal shutdown headline that also uses port-congestion words, and a prompt-injection headline. Day 4 fixed both: a keyword gap was closed, and headlines that give orders to the AI are now dropped before matching and before the model sees them. Identical agent requests are cached, and the AI call retries with backoff on 429 and 5xx errors.
 
+Full write-ups: [evaluation dataset and results](submissions/BlackRoute_Evaluation_Dataset_and_Results.pdf) and the [final progress report](submissions/BlackRoute_Final_Report.pdf).
+
 ## AI setup
 
 The agents run on **Google Gemini** (free tier) or any **OpenAI-compatible** API (Groq, OpenRouter, OpenAI, a local model). Copy `.env.example` to `.env` and add one key:
