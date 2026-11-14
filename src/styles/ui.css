@@ -319,6 +319,30 @@
   background: var(--green-soft);
 }
 
+/* ---------- stage entrance: content rises in, one block after another */
+.panel-body > * {
+  animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.panel-body > :nth-child(2) {
+  animation-delay: 0.05s;
+}
+.panel-body > :nth-child(3) {
+  animation-delay: 0.1s;
+}
+.panel-body > :nth-child(n + 4) {
+  animation-delay: 0.15s;
+}
+.actions.sticky {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel-body > *,
+  .log,
+  .node-card {
+    animation: none !important;
+  }
+}
+
 /* ---------- cards */
 .card {
   border-radius: 12px;
@@ -685,7 +709,7 @@
 .radar-nums {
   font-size: 12px;
   color: var(--text-3);
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 .weather {
   font-size: 12.5px;
@@ -1584,6 +1608,11 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+}
+.legend .legend-hint {
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+  color: var(--text-3);
 }
 .legend i {
   width: 16px;

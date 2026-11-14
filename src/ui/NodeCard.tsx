@@ -114,6 +114,7 @@ export function Legend() {
       <span>
         <i className="lg-black" /> black route
       </span>
+      <span className="legend-hint">Hover a building for details · click to open</span>
     </div>
   );
 }
