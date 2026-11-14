@@ -81,7 +81,7 @@ const DOCK_OF: Record<string, string> = { dubai_south: 'DSD', al_quoz: 'AQD', sh
 const PANEL_OFFSET: Record<string, P> = { dubai_south: [10, 2], al_quoz: [-8, -6], sharjah: [14, -4] };
 const TRUCK_COLOR = new THREE.Color('#f28c38');
 const SKU_SHORT: Record<string, string> = { ELEC: 'Electronics', AUTO: 'Auto parts', FMCG: 'Consumer' };
-const SKU_COLOR: Record<string, string> = { ELEC: '#38bdf8', AUTO: '#a78bfa', FMCG: '#4ade80' };
+const SKU_COLOR: Record<string, string> = { ELEC: '#0284c7', AUTO: '#7c3aed', FMCG: '#16a34a' };
 
 export class LocalBoard implements Board {
   readonly root = new THREE.Group();
@@ -125,7 +125,7 @@ export class LocalBoard implements Board {
   private buildBoard() {
     const slab = new THREE.Mesh(
       new RoundedBoxGeometry(86 - WEST + 4, 7, 116, 6, 2.2),
-      new THREE.MeshStandardMaterial({ color: '#717b88', roughness: 0.7, metalness: 0.25 }),
+      new THREE.MeshStandardMaterial({ color: '#bfc3bb', roughness: 0.8, metalness: 0.05 }),
     );
     slab.position.set((86 + WEST) / 2, -4.6, 0);
     slab.castShadow = true;
@@ -135,7 +135,7 @@ export class LocalBoard implements Board {
     // land
     const land = new THREE.Mesh(
       new THREE.BoxGeometry(84 - QUAY_X, 1.2, 112),
-      new THREE.MeshStandardMaterial({ color: '#414955', roughness: 0.95, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: '#dadcd5', roughness: 0.95, metalness: 0.0 }),
     );
     land.position.set((84 + QUAY_X) / 2, -0.6, 0);
     land.receiveShadow = true;
@@ -155,7 +155,7 @@ export class LocalBoard implements Board {
     this.root.add(water);
 
     // quay apron with a lit edge
-    const quay = new THREE.Mesh(new THREE.BoxGeometry(5, 1.3, 70), new THREE.MeshStandardMaterial({ color: '#6b7480', roughness: 0.8 }));
+    const quay = new THREE.Mesh(new THREE.BoxGeometry(5, 1.3, 70), new THREE.MeshStandardMaterial({ color: '#cdd1ca', roughness: 0.8 }));
     quay.position.set(QUAY_X + 2.5, -0.6, 0);
     quay.receiveShadow = true;
     this.root.add(quay);
@@ -250,8 +250,8 @@ export class LocalBoard implements Board {
   }
 
   private buildRoads() {
-    const asphalt = new THREE.MeshStandardMaterial({ color: '#2d333c', roughness: 0.85, metalness: 0.1 });
-    const lineMat = new THREE.MeshStandardMaterial({ color: '#dfe5ec', roughness: 0.7 });
+    const asphalt = new THREE.MeshStandardMaterial({ color: '#8f948d', roughness: 0.9, metalness: 0.0 });
+    const lineMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 });
     const dashGeo = new THREE.PlaneGeometry(1.2, 0.16);
     const dashes: THREE.Matrix4[] = [];
     for (const [a, b] of ROAD_EDGES) {
@@ -342,7 +342,7 @@ export class LocalBoard implements Board {
       const tex = (i % 3 === 0 ? texCool : texWarm).clone();
       tex.needsUpdate = true;
       tex.repeat.set(Math.max(1, t.w / 2.5), t.h / 6);
-      const mat = new THREE.MeshStandardMaterial({ color: '#59636f', map: tex, roughness: 0.4, metalness: 0.5, emissive: '#ffffff', emissiveMap: tex, emissiveIntensity: 0.55 });
+      const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', map: tex, roughness: 0.6, metalness: 0.05 });
       const hgt = t.h * 0.62;
       tex.repeat.set(Math.max(1, t.w / 2.5), hgt / 6);
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(t.w, hgt, t.d), mat);
@@ -363,7 +363,7 @@ export class LocalBoard implements Board {
     const spire = new THREE.Group();
     const tex = windowTexture(13, true);
     tex.repeat.set(1, 10);
-    const sm = new THREE.MeshStandardMaterial({ color: '#8a96a6', map: tex, roughness: 0.25, metalness: 0.8, emissive: '#ffffff', emissiveMap: tex, emissiveIntensity: 0.45 });
+    const sm = new THREE.MeshStandardMaterial({ color: '#f4f6f8', map: tex, roughness: 0.3, metalness: 0.35 });
     const tiers = [
       [3, 9],
       [2.3, 8],
@@ -393,7 +393,7 @@ export class LocalBoard implements Board {
   }
 
   private buildAirport() {
-    const runway = new THREE.Mesh(new THREE.BoxGeometry(44, 0.14, 4.6), new THREE.MeshStandardMaterial({ color: '#0f1724', roughness: 0.9 }));
+    const runway = new THREE.Mesh(new THREE.BoxGeometry(44, 0.14, 4.6), new THREE.MeshStandardMaterial({ color: '#9ea39b', roughness: 0.9 }));
     runway.position.set(26, 0.07, 48.5);
     runway.receiveShadow = true;
     this.root.add(runway);
@@ -414,12 +414,12 @@ export class LocalBoard implements Board {
     this.root.add(edges);
     const terminal = new THREE.Mesh(
       new THREE.BoxGeometry(12, 3.4, 5),
-      new THREE.MeshStandardMaterial({ color: '#1b2433', roughness: 0.6, metalness: 0.4, emissive: '#4fd8f5', emissiveIntensity: 0.12 }),
+      new THREE.MeshStandardMaterial({ color: '#e9ecee', roughness: 0.5, metalness: 0.2 }),
     );
     terminal.position.set(40, 1.7, 39);
     terminal.castShadow = true;
     this.root.add(terminal);
-    const glass = new THREE.Mesh(new THREE.BoxGeometry(12.1, 0.8, 5.1), new THREE.MeshStandardMaterial({ color: '#0c1f2a', emissive: '#4fd8f5', emissiveIntensity: 1.8 }));
+    const glass = new THREE.Mesh(new THREE.BoxGeometry(12.1, 0.8, 5.1), new THREE.MeshStandardMaterial({ color: '#8fb5c9', roughness: 0.15, metalness: 0.4 }));
     glass.position.set(40, 2.4, 39);
     this.root.add(glass);
 
@@ -428,7 +428,7 @@ export class LocalBoard implements Board {
     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.6, 9, 10), new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.4, metalness: 0.3 }));
     body.rotation.z = Math.PI / 2;
     const wing = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.15, 10), new THREE.MeshStandardMaterial({ color: '#cbd5e1' }));
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2, 0.15), new THREE.MeshStandardMaterial({ color: '#22d3ee', emissive: '#22d3ee', emissiveIntensity: 0.8 }));
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2, 0.15), new THREE.MeshStandardMaterial({ color: '#0f8f80' }));
     tail.position.set(-4, 1, 0);
     const navL = new THREE.Mesh(new THREE.SphereGeometry(0.18, 6, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff3355').multiplyScalar(5) }));
     navL.position.set(0, 0, -5);
@@ -446,7 +446,7 @@ export class LocalBoard implements Board {
     for (const p of PORTALS) {
       const pos = ROAD_NODES[p.node];
       const gate = new THREE.Group();
-      const pylonMat = new THREE.MeshStandardMaterial({ color: '#111827', metalness: 0.6, roughness: 0.4 });
+      const pylonMat = new THREE.MeshStandardMaterial({ color: '#9aa09a', metalness: 0.3, roughness: 0.5 });
       const glow = new THREE.MeshBasicMaterial({ color: new THREE.Color('#22d3ee').multiplyScalar(2.6) });
       for (const s of [-1, 1]) {
         const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.6, 5, 0.6), pylonMat);
@@ -588,7 +588,7 @@ export class LocalBoard implements Board {
     // red shield over a shut port
     this.dome = new THREE.Mesh(
       new THREE.SphereGeometry(22, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color('#f43f5e').multiplyScalar(0.6), transparent: true, opacity: 0.12, depthWrite: false, blending: THREE.AdditiveBlending, wireframe: true }),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color('#dc2626'), transparent: true, opacity: 0.22, depthWrite: false, wireframe: true }),
     );
     this.dome.position.set(-38, 0, 0);
     this.dome.visible = false;
@@ -606,7 +606,7 @@ export class LocalBoard implements Board {
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     this.dust = new THREE.Points(
       geo,
-      new THREE.PointsMaterial({ color: new THREE.Color('#f5a35b').multiplyScalar(1.3), size: 0.55, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }),
+      new THREE.PointsMaterial({ color: new THREE.Color('#c79a5c'), size: 0.55, transparent: true, opacity: 0.6, depthWrite: false }),
     );
     this.dust.visible = false;
     this.root.add(this.dust);
@@ -882,7 +882,7 @@ export class LocalBoard implements Board {
       }
       pos.needsUpdate = true;
     }
-    (this.grid.uniforms.uColor.value as THREE.Color).set(storm ? '#b7791f' : '#2b6cb0');
+    (this.grid.uniforms.uColor.value as THREE.Color).set(storm ? '#b7791f' : '#6b7268');
 
     // road closure barriers on the E311
     const roadShut = active && sc?.kind === 'road_closure';
@@ -948,7 +948,7 @@ export class LocalBoard implements Board {
       });
       const out = active && state.scenario?.kind === 'dc_outage' && state.scenario.target === dc.id;
       const tone: Tone = out || (late && minCover < 0.15) ? 'down' : (active || late) && minCover < 0.6 ? 'risk' : 'normal';
-      for (const b of bars) if (tone !== 'normal' && b.days < 0.6) b.color = b.days < 0.15 ? '#f43f5e' : '#fbbf24';
+      for (const b of bars) if (tone !== 'normal' && b.days < 0.6) b.color = b.days < 0.15 ? '#dc2626' : '#d97706';
       this.ringTone(n, focus === dc.id ? 'radar' : tone);
       n.panel?.set(dc.name, out ? 'offline · no stock in or out' : tone === 'down' ? 'out of stock' : tone === 'risk' ? 'running low' : 'days of stock', tone);
       n.panel?.setBars(bars);

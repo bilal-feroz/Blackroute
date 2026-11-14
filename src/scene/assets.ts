@@ -1,5 +1,5 @@
 // Loads the low-poly model kit (public/models/kit.glb) and repaints it in the
-// BlackRoute look: slate concrete, warm lit windows and bright blue cranes. Each model is baked into one merged mesh per
+// BlackRoute daylight look: a white architectural model with coloured cranes, ships and trucks. Each model is baked into one merged mesh per
 // material so a clone costs a handful of draw calls.
 
 import * as THREE from 'three';
@@ -8,34 +8,34 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 type Look = { color: string; rough?: number; metal?: number; emissive?: string; glow?: number };
 
-const WALL: Look = { color: '#4a525e', rough: 0.85 };
-const ROOF: Look = { color: '#363d48', rough: 0.75, metal: 0.15 };
-const WARM_GLASS: Look = { color: '#5a3a12', emissive: '#ffb347', glow: 1.5 };
-const COOL_GLASS: Look = { color: '#1f3f55', rough: 0.15, metal: 0.5, emissive: '#7dd3fc', glow: 0.35 };
+const WALL: Look = { color: '#e9eae6', rough: 0.85 };
+const ROOF: Look = { color: '#c9ccc6', rough: 0.8 };
+const WARM_GLASS: Look = { color: '#9fb6c6', rough: 0.2, metal: 0.3 };
+const COOL_GLASS: Look = { color: '#a7c2d2', rough: 0.15, metal: 0.4 };
 
-/** Dusk palette matching the BlackRoute concept art: slate concrete, warm windows, blue cranes. */
+/** Daylight palette: pale concrete and walls, glass in soft blue-grey, colour kept for the working parts. */
 const LOOKS: Record<string, Look> = {
-  Concrete: { color: '#5d6672', rough: 0.95 },
+  Concrete: { color: '#d3d6cf', rough: 0.95 },
   Wall: WALL,
   HubCWall: WALL,
-  ColdWall: { color: '#55606d', rough: 0.8 },
-  SouthWall: { color: '#4f5864', rough: 0.85 },
-  WallSand: { color: '#5c5b5a', rough: 0.85 },
+  ColdWall: { color: '#eef1f2', rough: 0.8 },
+  SouthWall: { color: '#eceee9', rough: 0.85 },
+  WallSand: { color: '#ece6da', rough: 0.85 },
   OfficeWall: WALL,
-  HubCRib: { color: '#5d6876', rough: 0.6, metal: 0.3 },
-  PanelLine: { color: '#5d6876', rough: 0.7 },
-  SlateBand: { color: '#3d4550' },
+  HubCRib: { color: '#d3d7d2', rough: 0.6, metal: 0.2 },
+  PanelLine: { color: '#c9cdc7', rough: 0.7 },
+  SlateBand: { color: '#2b2f34' },
   Roof: ROOF,
   RoofFlat: ROOF,
-  RoofSilver: { color: '#5a6370', rough: 0.45, metal: 0.55 },
+  RoofSilver: { color: '#d5d9dc', rough: 0.45, metal: 0.4 },
   RoofSage: ROOF,
   RoofSand: ROOF,
   RoofLight: ROOF,
   TintRoof: ROOF,
-  Solar: { color: '#1e3a5f', rough: 0.25, metal: 0.4 },
-  SolarFrame: { color: '#8892a0', metal: 0.6 },
-  Hvac: { color: '#7b8592', metal: 0.5 },
-  Condenser: { color: '#7b8592', metal: 0.5 },
+  Solar: { color: '#3b5878', rough: 0.25, metal: 0.4 },
+  SolarFrame: { color: '#c3c8cc', metal: 0.4 },
+  Hvac: { color: '#c9cdd1', metal: 0.3 },
+  Condenser: { color: '#c9cdd1', metal: 0.3 },
   Glass: WARM_GLASS,
   GlassWarm: WARM_GLASS,
   GlassBlue: COOL_GLASS,
@@ -43,18 +43,18 @@ const LOOKS: Record<string, Look> = {
   GlassSky: COOL_GLASS,
   GlassViolet: COOL_GLASS,
   GlassCab: COOL_GLASS,
-  GlassDark: { color: '#1b2430', rough: 0.2, metal: 0.4 },
-  Door: { color: '#6b4a1e', emissive: '#ff9f2e', glow: 1.1 },
-  DoorLight: { color: '#6b4a1e', emissive: '#ffc061', glow: 1.8 },
-  Lamp: { color: '#ffe9b8', emissive: '#ffd27a', glow: 0.9 },
-  Lantern: { color: '#ffe9b8', emissive: '#ffd27a', glow: 1.1 },
-  Beacon: { color: '#ff5a6e', emissive: '#ff3355', glow: 1.5 },
-  Brand: { color: '#1d4ed8', emissive: '#3b82f6', glow: 0.5 },
+  GlassDark: { color: '#5b6b78', rough: 0.2, metal: 0.4 },
+  Door: { color: '#8a9096' },
+  DoorLight: { color: '#9aa0a6' },
+  Lamp: { color: '#f5f2ea' },
+  Lantern: { color: '#f5f2ea' },
+  Beacon: { color: '#ef4444', emissive: '#ef4444', glow: 0.6 },
+  Brand: { color: '#1d4ed8' },
   Teal: { color: '#0f766e' },
-  Canopy: { color: '#525c69', metal: 0.4 },
+  Canopy: { color: '#cfd3d6', metal: 0.3 },
   Bumper: { color: '#f59e0b' },
-  Seal: { color: '#2a313b' },
-  Dark: { color: '#2b323c', rough: 0.8 },
+  Seal: { color: '#4b5157' },
+  Dark: { color: '#5a6067', rough: 0.8 },
   Metal: { color: '#8a94a1', rough: 0.4, metal: 0.8 },
   White: { color: '#cfd6df', rough: 0.6 },
   Chimney: { color: '#7b8592', metal: 0.5 },
@@ -63,10 +63,10 @@ const LOOKS: Record<string, Look> = {
   CraneWhite: { color: '#e8eef6', rough: 0.5, metal: 0.2 },
   PortBlue: { color: '#2563eb' },
   Radar: { color: '#cbd5e1', metal: 0.7 },
-  Navy: { color: '#334155' },
+  Navy: { color: '#2b3a4f' },
   HullLow: { color: '#b4232f', rough: 0.6 },
   HullTop: { color: '#1f3b63', rough: 0.5, metal: 0.25 },
-  Deck: { color: '#59636f' },
+  Deck: { color: '#a3aab0' },
   Funnel: { color: '#d7dde5' },
   Bow: { color: '#1f3b63' },
   Box0: { color: '#e8793a', rough: 0.6 },
@@ -101,9 +101,9 @@ function nightMaterial(src: THREE.Material): THREE.MeshStandardMaterial {
   if (cached) return cached;
   let look = LOOKS[name];
   if (!look) {
-    // anything we did not plan for: keep its hue, darken it for the night
-    const c = (src as THREE.MeshStandardMaterial).color?.clone() ?? new THREE.Color('#888');
-    c.multiplyScalar(0.7);
+    // anything we did not plan for: keep its hue, lift it towards white for daylight
+    const c = (src as THREE.MeshStandardMaterial).color?.clone() ?? new THREE.Color('#bbb');
+    c.lerp(new THREE.Color('#ffffff'), 0.35);
     look = { color: `#${c.getHexString()}` };
   }
   const m = new THREE.MeshStandardMaterial({

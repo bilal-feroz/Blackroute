@@ -58,7 +58,7 @@ export class GlobalBoard implements Board {
   }
 
   private buildBoard() {
-    const slab = new THREE.Mesh(new RoundedBoxGeometry(W + 6, 7, H + 6, 6, 2.2), new THREE.MeshStandardMaterial({ color: '#717b88', roughness: 0.7, metalness: 0.25 }));
+    const slab = new THREE.Mesh(new RoundedBoxGeometry(W + 6, 7, H + 6, 6, 2.2), new THREE.MeshStandardMaterial({ color: '#bfc3bb', roughness: 0.8, metalness: 0.05 }));
     slab.position.y = -4.6;
     slab.castShadow = true;
     this.root.add(slab);
@@ -67,8 +67,8 @@ export class GlobalBoard implements Board {
     water.uniforms.uQuayX.value = 999; // no quay glow on the open ocean
     water.uniforms.uTrace.value = 0.45;
     water.uniforms.uTraceScale.value = 2.6;
-    water.uniforms.uDeep.value = new THREE.Color('#0d4650');
-    water.uniforms.uShallow.value = new THREE.Color('#0f5f62');
+    water.uniforms.uDeep.value = new THREE.Color('#9cc8cd');
+    water.uniforms.uShallow.value = new THREE.Color('#b8dcdc');
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(W, H), water);
     sea.rotation.x = -Math.PI / 2;
     sea.position.y = -0.9;
@@ -82,8 +82,8 @@ export class GlobalBoard implements Board {
     const land = feature(landTopo as unknown as Topology, (landTopo as unknown as Topology).objects.land) as unknown as GeoJSON.FeatureCollection;
     const px = (lon: number) => ((lon - LON0) / (LON1 - LON0)) * canvas.width;
     const py = (lat: number) => (1 - (lat - LAT0) / (LAT1 - LAT0)) * canvas.height;
-    g.fillStyle = '#4b5460';
-    g.strokeStyle = '#8a95a3';
+    g.fillStyle = '#e4e6df';
+    g.strokeStyle = '#a9aea5';
     g.lineWidth = 2.2;
     const drawRing = (raw: number[][]) => {
       // unwrap longitudes so shapes crossing the date line (Fiji, Russia's far east)
@@ -148,7 +148,7 @@ export class GlobalBoard implements Board {
     this.root.add(landMesh);
     // a thin solid layer under the land texture gives the continents a little thickness
     const under = landMesh.clone();
-    under.material = new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.35, color: '#2c333d' });
+    under.material = new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.35, color: '#c9cdc5' });
     under.position.y = -0.5;
     this.root.add(under);
   }
@@ -345,8 +345,8 @@ export class GlobalBoard implements Board {
   private updateShips(run: SimRun, h: number) {
     let n = 0;
     const max = this.ships.instanceMatrix.count;
-    const red = new THREE.Color('#f43f5e');
-    const green = new THREE.Color('#4ade80');
+    const red = new THREE.Color('#dc2626');
+    const green = new THREE.Color('#16a34a');
     const white = new THREE.Color('#3d6fb8');
     for (const v of run.vessels) {
       if (n >= max) break;
