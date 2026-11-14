@@ -29,16 +29,10 @@ export function TopBar({
   return (
     <header className="topbar">
       <div className="brand">
-        <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden>
-          <defs>
-            <linearGradient id="brg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#2dd4bf" />
-              <stop offset="1" stopColor="#a3e635" />
-            </linearGradient>
-          </defs>
-          <rect width="64" height="64" rx="15" fill="#1c2a3e" />
-          <path d="M14 44 L28 30 L36 38 L50 22" fill="none" stroke="url(#brg)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="28" cy="30" r="4" fill="#f43f5e" />
+        <svg className="brand-mark" viewBox="0 0 64 64" width="34" height="34" aria-hidden>
+          <rect width="64" height="64" rx="16" fill="#15171a" />
+          <path d="M14 44 L28 30 L36 38 L50 22" fill="none" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="28" cy="30" r="5" fill="#ea580c" stroke="#15171a" strokeWidth="2" />
         </svg>
         <div>
           <b>BlackRoute</b>
@@ -66,7 +60,7 @@ export function TopBar({
           title={ai ? `Click to ${useAi ? 'use rule-based agents' : 'use the AI model'}` : 'No AI key on the server: agents use rule-based reports'}
         >
           <Sparkles size={13} />
-          {aiOn ? `AI · ${ai!.model}` : ai ? 'AI paused' : 'AI offline · rules'}
+          {aiOn ? `AI on · ${ai!.model.split('/').pop()}` : ai ? 'AI paused' : 'AI offline · rules'}
         </button>
         <button className="icon-btn" onClick={onResetCamera} title="Reset the camera">
           <RotateCcw size={15} />
