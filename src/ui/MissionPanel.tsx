@@ -5,7 +5,9 @@ import {
   CheckCircle2,
   ChevronRight,
   Copy,
+  Download,
   ExternalLink,
+  FileJson,
   FlaskConical,
   Mail,
   MessageCircle,
@@ -25,6 +27,7 @@ import { aed, ago, dayTime, days, pct, tonnes } from '../core/format';
 import { leverNames } from '../agents/tools';
 import { AgentHeader, Bar, Button, Card, Metric } from './bits';
 import { STAGES, type Mission, type Stage, type useMission } from './useMission';
+import { actionPackJson, actionPackMarkdown, download } from './actionPack';
 
 type Actions = ReturnType<typeof useMission>;
 
@@ -617,6 +620,12 @@ function Recover({ a, onReplay, compare, setCompare }: { a: Actions; onReplay: (
       <div className="actions sticky">
         <Button kind="ghost" onClick={a.reset} icon={<ArrowLeft size={15} />}>
           Back to watching
+        </Button>
+        <Button kind="ghost" onClick={() => download(`blackroute-${m.scenario!.id}.json`, JSON.stringify(actionPackJson(m), null, 2), 'application/json')} icon={<FileJson size={15} />}>
+          JSON
+        </Button>
+        <Button onClick={() => download(`blackroute-action-pack-${m.scenario!.id}.md`, actionPackMarkdown(m), 'text/markdown')} disabled={!d} icon={<Download size={15} />}>
+          Download pack
         </Button>
       </div>
     </>
