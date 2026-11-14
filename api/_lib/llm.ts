@@ -11,7 +11,7 @@ export interface Provider {
 
 export function provider(): Provider | null {
   if (process.env.GEMINI_API_KEY) return { name: 'gemini', model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' };
-  if (process.env.OPENAI_COMPAT_API_KEY) return { name: 'openai-compatible', model: process.env.OPENAI_COMPAT_MODEL || 'llama-3.3-70b-versatile' };
+  if (process.env.OPENAI_COMPAT_API_KEY) return { name: 'openai-compatible', model: process.env.OPENAI_COMPAT_MODEL || 'openai/gpt-oss-120b' };
   return null;
 }
 
@@ -51,6 +51,21 @@ function userMessage(agent: AgentId, tools: unknown, signals: unknown): string {
   return parts.join('\n\n');
 }
 
+/** Gemini's schema format (OBJECT, STRING...) to standard JSON Schema for strict mode. */
+function toJsonSchema(s: unknown): unknown {
+  if (!s || typeof s !== 'object') return s;
+  const o = s as { type?: string; properties?: Record<string, unknown>; items?: unknown; enum?: string[]; required?: string[] };
+  const out: Record<string, unknown> = { type: (o.type ?? 'string').toLowerCase() };
+  if (o.enum) out.enum = o.enum;
+  if (o.items) out.items = toJsonSchema(o.items);
+  if (o.properties) {
+    out.properties = Object.fromEntries(Object.entries(o.properties).map(([k, v]) => [k, toJsonSchema(v)]));
+    out.required = o.required ?? Object.keys(o.properties);
+    out.additionalProperties = false;
+  }
+  return out;
+}
+
 export async function runAgent(agent: AgentId, tools: unknown, signals: unknown): Promise<{ text: string; model: string; provider: string }> {
   const p = provider();
   if (!p) throw new Error('no-provider');
@@ -75,19 +90,27 @@ export async function runAgent(agent: AgentId, tools: unknown, signals: unknown)
   }
 
   const base = (process.env.OPENAI_COMPAT_BASE_URL || 'https://api.groq.com/openai/v1').replace(/\/$/, '');
-  const res = await withTimeout(`${base}/chat/completions`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.OPENAI_COMPAT_API_KEY}` },
-    body: JSON.stringify({
-      model: p.model,
-      temperature: 0.3,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: `${system}\n\nJSON schema to follow:\n${schemaHint(agent)}` },
-        { role: 'user', content: user },
-      ],
-    }),
-  });
+  const call = (strict: boolean) =>
+    withTimeout(`${base}/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.OPENAI_COMPAT_API_KEY}` },
+      body: JSON.stringify({
+        model: p.model,
+        temperature: 0.3,
+        // reasoning models: think briefly and keep the thinking out of the answer
+        ...(/gpt-oss/.test(p.model) ? { reasoning_effort: 'low', include_reasoning: false } : {}),
+        // strict schema where the provider supports it, plain JSON mode otherwise
+        response_format: strict
+          ? { type: 'json_schema', json_schema: { name: `${agent}_report`, strict: true, schema: toJsonSchema(RESPONSE_SCHEMA[agent]) } }
+          : { type: 'json_object' },
+        messages: [
+          { role: 'system', content: `${system}\n\nJSON schema to follow:\n${schemaHint(agent)}` },
+          { role: 'user', content: user },
+        ],
+      }),
+    });
+  let res = await call(true);
+  if (res.status === 400) res = await call(false);
   if (!res.ok) throw new Error(`provider ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   return { text: data.choices?.[0]?.message?.content ?? '', model: p.model, provider: 'OpenAI-compatible' };
