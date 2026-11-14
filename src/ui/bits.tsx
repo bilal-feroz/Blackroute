@@ -1,17 +1,17 @@
 // Small shared pieces of the BlackRoute interface.
-import type { ReactNode } from 'react';
-import { BrainCircuit, CheckCircle2, Cpu, Radar, Send, ShieldAlert, TriangleAlert, User, Waypoints } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { BrainCircuit, CheckCircle2, Cpu, Radar, Send, ShieldAlert, ThumbsDown, ThumbsUp, TriangleAlert, User, Waypoints } from 'lucide-react';
 import type { AgentReport } from '../agents/run';
 import type { LogEntry } from './useMission';
 
 export const AGENT_META: Record<LogEntry['agent'], { name: string; color: string; Icon: typeof Radar; role: string }> = {
   sentinel: { name: 'Sentinel', color: 'var(--teal)', Icon: Radar, role: 'watches signals' },
   tracer: { name: 'Tracer', color: 'var(--cyan)', Icon: Waypoints, role: 'traces the impact' },
-  strategist: { name: 'Strategist', color: 'var(--lime)', Icon: BrainCircuit, role: 'tests recovery plans' },
+  strategist: { name: 'Strategist', color: 'var(--green)', Icon: BrainCircuit, role: 'tests recovery plans' },
   redteam: { name: 'Red Team', color: 'var(--red)', Icon: ShieldAlert, role: 'tries to break the plan' },
   dispatcher: { name: 'Dispatcher', color: 'var(--amber)', Icon: Send, role: 'drafts the actions' },
-  human: { name: 'You', color: 'var(--violet)', Icon: User, role: 'decides' },
-  system: { name: 'BlackRoute', color: 'rgba(224,235,247,0.6)', Icon: Cpu, role: 'simulator' },
+  human: { name: 'You', color: 'var(--ink)', Icon: User, role: 'decides' },
+  system: { name: 'BlackRoute', color: 'var(--text-3)', Icon: Cpu, role: 'simulator' },
 };
 
 export function AgentChip({ agent, size = 26 }: { agent: LogEntry['agent']; size?: number }) {
@@ -34,7 +34,46 @@ export function AgentHeader({ agent, report, busy }: { agent: Exclude<LogEntry['
       </div>
       {busy && <span className="pulse-dot" />}
       {report && <SourceTag report={report} />}
+      {report && <Feedback agent={agent} report={report} />}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------- feedback
+const FEEDBACK_KEY = 'blackroute-feedback';
+type Vote = { agent: string; source: string; model?: string; vote: 'up' | 'down'; headline: string; at: string };
+
+function readVotes(): Vote[] {
+  try {
+    return JSON.parse(localStorage.getItem(FEEDBACK_KEY) ?? '[]') as Vote[];
+  } catch {
+    return [];
+  }
+}
+
+/** Thumbs up or down on a report, kept in this browser to review which agent answers help. */
+function Feedback({ agent, report }: { agent: string; report: AgentReport }) {
+  const headline = (report.out as { headline?: string; brief?: string; summary?: string }).headline ?? (report.out as { brief?: string }).brief ?? '';
+  const [vote, setVote] = useState<'up' | 'down' | null>(() => readVotes().find((v) => v.agent === agent && v.headline === headline)?.vote ?? null);
+  const cast = (v: 'up' | 'down') => {
+    setVote(v);
+    try {
+      const rest = readVotes().filter((x) => !(x.agent === agent && x.headline === headline));
+      rest.push({ agent, source: report.source, model: report.model, vote: v, headline, at: new Date().toISOString() });
+      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(rest.slice(-200)));
+    } catch {
+      /* storage blocked: the vote still shows for this session */
+    }
+  };
+  return (
+    <span className="feedback" role="group" aria-label="Was this report useful?">
+      <button className={vote === 'up' ? 'on' : ''} onClick={() => cast('up')} aria-pressed={vote === 'up'} title="Useful">
+        <ThumbsUp size={13} />
+      </button>
+      <button className={vote === 'down' ? 'on down' : ''} onClick={() => cast('down')} aria-pressed={vote === 'down'} title="Not useful">
+        <ThumbsDown size={13} />
+      </button>
+    </span>
   );
 }
 
