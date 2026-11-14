@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "exam": "vitest run tests/exam.test.ts --silent=false"
+    "exam": "vitest run tests/exam.test.ts --silent=false",
+    "exam:live": "node -e \"process.env.LIVE_EXAM='1';require('child_process').execSync('npx vitest run tests/exam.live.test.ts --silent=false',{stdio:'inherit'})\""
   },
   "engines": {
     "node": ">=20.19"
