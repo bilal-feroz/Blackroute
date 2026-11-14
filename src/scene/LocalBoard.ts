@@ -35,8 +35,24 @@ const ANCHORAGE: P[] = [
   [-60, 42],
   [-58, 0],
 ];
-const SEA_ENTRY: P = [-74, -6];
 const WEST = -66;
+// ships sail in at the north end of the water channel and out at the south end,
+// so they never cross the edge of the board
+const SEA_IN: P = [-56, -50];
+const SEA_OUT: P = [-56, 50];
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const bez = (a: P, c: P, b: P, t: number): P => {
+  const u = 1 - t;
+  return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
+};
+const bezHeading = (a: P, c: P, b: P, t: number) => {
+  const dx = 2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0]);
+  const dz = 2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
+  return Math.atan2(dx, dz);
+};
+/** shortest signed turn from a to b */
+const turn = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
 const DC_POS: Record<string, { pos: P; rot: number; model: string }> = {
   dubai_south: { pos: [0, 33.5], rot: Math.PI, model: 'hub_south' },
@@ -62,6 +78,19 @@ interface ShipView {
   group: THREE.Group;
   bays: THREE.Object3D[];
   label: Label;
+  /** own copies of the materials so each ship can fade on its own */
+  mats: THREE.MeshStandardMaterial[];
+  vesselId: string | null;
+  x: number;
+  z: number;
+  heading: number;
+}
+
+interface ShipPose {
+  p: P;
+  heading: number;
+  frac: number;
+  opacity: number;
 }
 
 interface NodeView {
@@ -239,11 +268,18 @@ export class LocalBoard implements Board {
       g.position.set(-200, -0.75, 0);
       g.visible = false;
       const bays = g.children.filter((c) => c.name.startsWith('ship_cargo'));
+      const mats: THREE.MeshStandardMaterial[] = [];
+      g.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        m.material = (m.material as THREE.MeshStandardMaterial).clone();
+        mats.push(m.material as THREE.MeshStandardMaterial);
+      });
       const l = label('', '', 'ship');
       l.obj.position.set(0, 11, 0);
       g.add(l.obj);
       this.root.add(g);
-      this.ships.push({ group: g, bays, label: l });
+      this.ships.push({ group: g, bays, label: l, mats, vesselId: null, x: 0, z: 0, heading: Math.PI / 2 });
     }
 
     this.addNode('jebel_ali', [-30, 0], 10, 'Jebel Ali Port', 16);
@@ -540,7 +576,8 @@ export class LocalBoard implements Board {
     }
     // inbound sea lane: ships arrive from the open sea
     const laneMat = flowMaterial('normal', { speed: 0.3, dashes: 6 });
-    const lane = tube(arcPoints(v3([WEST - 8, -6], 0), v3([-52, 0], 0), 6), 0.16, laneMat);
+    const lanePts = Array.from({ length: 40 }, (_, i) => v3(bez(SEA_IN, [-62, 0], [-52, 0], i / 39), 0.1));
+    const lane = tube(lanePts, 0.16, laneMat);
     this.root.add(lane);
     this.routes.sea = { mesh: lane, mat: laneMat };
   }
@@ -643,7 +680,7 @@ export class LocalBoard implements Board {
     const acting = levers.size > 0 && h >= (run?.options.actHour ?? disruption?.startHour ?? 0);
 
     if (run) {
-      this.updateShips(run, h);
+      this.updateShips(run, h, dt);
       this.updateTrucks(run, h);
       this.updateYard(run, h);
       this.updateCranes(run, h, t);
@@ -660,7 +697,8 @@ export class LocalBoard implements Board {
     }
   }
 
-  private vesselPose(v: VesselTrack, h: number, queueIndex: number): { p: P; visible: boolean; heading: number; frac: number } | null {
+  /** Where a ship is at hour h: sailing in along a curve, at anchor, at the berth or sailing out. */
+  private vesselPose(v: VesselTrack, h: number, queueIndex: number): ShipPose | null {
     if (v.port !== 'jebel_ali') return null;
     const approach = 14;
     const berthIdx = v.berthHour !== null ? (Number(v.id.split('-').pop()) + v.origin.length) % 2 : 0;
@@ -668,40 +706,86 @@ export class LocalBoard implements Board {
     const anchor = ANCHORAGE[queueIndex % ANCHORAGE.length];
     if (h < v.eta - approach) return null;
     if (h < v.eta) {
+      // ease out: slow down as it nears the berth or anchorage
       const f = (h - (v.eta - approach)) / approach;
-      const target = v.berthHour !== null && v.berthHour <= v.eta + 1 ? berth : anchor;
-      return { p: [SEA_ENTRY[0] + (target[0] - SEA_ENTRY[0]) * f, SEA_ENTRY[1] + (target[1] - SEA_ENTRY[1]) * f], visible: true, heading: Math.PI / 2, frac: 0 };
+      const e = 1 - (1 - f) ** 2;
+      const toBerth = v.berthHour !== null && v.berthHour <= v.eta + 1;
+      const target = toBerth ? berth : anchor;
+      // berths are approached side-on from the channel, anchorages straight down it
+      const ctrl: P = toBerth ? [-61, target[1]] : [(SEA_IN[0] + target[0]) / 2, (SEA_IN[1] + target[1]) / 2];
+      return { p: bez(SEA_IN, ctrl, target, e), heading: bezHeading(SEA_IN, ctrl, target, Math.min(e, 0.98)), frac: 0, opacity: Math.min(1, f / 0.12) };
     }
-    if (v.berthHour === null || h < v.berthHour) return { p: anchor, visible: true, heading: Math.PI / 2 + 0.3 * Math.sin(queueIndex), frac: 0 };
+    if (v.berthHour === null || h < v.berthHour) return { p: anchor, heading: Math.PI / 2 + 0.3 * Math.sin(queueIndex), frac: 0, opacity: 1 };
     const done = v.doneHour ?? v.berthHour + 10;
-    if (h < done) return { p: berth, visible: true, heading: Math.PI / 2, frac: (h - v.berthHour) / Math.max(1, done - v.berthHour) };
-    if (h < done + 10) {
-      const f = (h - done) / 10;
-      return { p: [berth[0] + (SEA_ENTRY[0] - berth[0]) * f, berth[1] + (SEA_ENTRY[1] - 20 - berth[1]) * f], visible: true, heading: -Math.PI / 2, frac: 1 };
+    if (h < done) return { p: berth, heading: Math.PI / 2, frac: (h - v.berthHour) / Math.max(1, done - v.berthHour), opacity: 1 };
+    if (h < done + 12) {
+      // ease in: pull away gently, then pick up speed down the channel
+      const f = (h - done) / 12;
+      const e = f * f;
+      const ctrl: P = [-62, berth[1] + 10];
+      return { p: bez(berth, ctrl, SEA_OUT, e), heading: bezHeading(berth, ctrl, SEA_OUT, Math.max(e, 0.02)), frac: 1, opacity: Math.min(1, (1 - f) / 0.15) };
     }
     return null;
   }
 
-  private updateShips(run: SimRun, h: number) {
-    let slot = 0;
+  private updateShips(run: SimRun, h: number, dt: number) {
+    const seen = new Set<string>();
     let q = 0;
     for (const v of run.vessels) {
       const waiting = v.port === 'jebel_ali' && h >= v.eta && (v.berthHour === null || h < v.berthHour);
-      const pose = this.vesselPose(v, h, waiting ? q : slot);
+      const pose = this.vesselPose(v, h, q);
       if (waiting) q++;
       if (!pose) continue;
-      const ship = this.ships[slot++];
-      if (!ship) break;
-      ship.group.visible = true;
-      ship.group.position.set(pose.p[0], -0.75 + Math.sin(sharedTime.value * 0.8 + slot) * 0.08, pose.p[1]);
-      ship.group.rotation.y = pose.heading;
+      // each vessel keeps the same ship model while it is on the board
+      let ship = this.ships.find((x) => x.vesselId === v.id);
+      const fresh = !ship;
+      if (!ship) ship = this.ships.find((x) => !x.vesselId);
+      if (!ship) continue;
+      ship.vesselId = v.id;
+      seen.add(v.id);
+
+      // glide towards the pose so a change of plan (anchor to berth) looks like sailing;
+      // a big jump (scrubbing the timeline) snaps
+      const dx = pose.p[0] - ship.x;
+      const dz = pose.p[1] - ship.z;
+      const far = Math.hypot(dx, dz);
+      if (fresh || far > 40) {
+        ship.x = pose.p[0];
+        ship.z = pose.p[1];
+        ship.heading = pose.heading;
+      } else {
+        const k = 1 - Math.exp(-dt * 4);
+        ship.x = lerp(ship.x, pose.p[0], k);
+        ship.z = lerp(ship.z, pose.p[1], k);
+        // point the bow where it is going while it moves, then settle on the pose heading
+        const want = far > 1.5 ? Math.atan2(dx, dz) : pose.heading;
+        ship.heading += turn(ship.heading, want) * (1 - Math.exp(-dt * 3));
+      }
+      const g = ship.group;
+      g.visible = true;
+      g.position.set(ship.x, -0.75 + Math.sin(sharedTime.value * 0.8 + v.eta) * 0.08, ship.z);
+      g.rotation.y = ship.heading;
+      const fade = pose.opacity < 0.999;
+      for (const m of ship.mats) {
+        if (m.transparent !== fade) {
+          m.transparent = fade;
+          m.depthWrite = !fade;
+          m.needsUpdate = true;
+        }
+        m.opacity = pose.opacity;
+      }
+      ship.label.el.style.opacity = String(pose.opacity);
       // cargo bays empty out as the cranes work
       const left = Math.ceil((1 - pose.frac) * ship.bays.length);
-      ship.bays.forEach((b, i) => (b.visible = i < left));
-      const status = waiting ? (h - v.eta > 24 ? `waiting ${Math.round((h - v.eta) / 24)}d at anchor` : 'at anchor') : pose.frac > 0 && pose.frac < 1 ? 'unloading' : pose.frac >= 1 ? 'leaving' : 'arriving';
+      ship.bays.forEach((bay, i) => (bay.visible = i < left));
+      const status = waiting ? (h - v.eta > 24 ? 'waiting ' + Math.round((h - v.eta) / 24) + 'd at anchor' : 'at anchor') : pose.frac > 0 && pose.frac < 1 ? 'unloading' : pose.frac >= 1 ? 'leaving' : 'arriving';
       ship.label.set(v.name, status, waiting && h - v.eta > 24 ? 'risk' : 'normal');
     }
-    for (let i = slot; i < this.ships.length; i++) this.ships[i].group.visible = false;
+    for (const x of this.ships) {
+      if (x.vesselId && seen.has(x.vesselId)) continue;
+      x.vesselId = null;
+      x.group.visible = false;
+    }
   }
 
   private updateTrucks(run: SimRun, h: number) {
