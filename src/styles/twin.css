@@ -31,6 +31,8 @@
   align-items: center;
   gap: 7px;
   padding: 5px 9px 5px 7px;
+  pointer-events: auto;
+  cursor: default;
   border-radius: 9px;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(21, 23, 26, 0.1);
@@ -40,8 +42,13 @@
   font-family: var(--font);
   white-space: nowrap;
   transform: translateY(-50%);
-  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.08), 0 6px 16px rgba(21, 23, 26, 0.1);
-  transition: border-color 0.3s, background 0.3s, opacity 0.3s;
+  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.08), 0 4px 12px rgba(21, 23, 26, 0.08);
+  transition: border-color 0.3s, background 0.3s, opacity 0.3s, box-shadow 0.2s;
+}
+.tl:hover,
+.tl.hovered {
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.08), 0 10px 24px rgba(21, 23, 26, 0.14);
 }
 .tl-text {
   display: flex;
@@ -54,10 +61,20 @@
   letter-spacing: 0.01em;
 }
 .tl i {
+  display: none;
   font-style: normal;
   font-size: 10.5px;
   color: #686e75;
   font-family: var(--font-mono);
+}
+/* details only on hover, or when the node needs attention */
+.tl:hover i,
+.tl.hovered i,
+.tl[data-tone='risk'] i,
+.tl[data-tone='down'] i,
+.tl[data-tone='recovery'] i,
+.tl-incident i {
+  display: block;
 }
 .tl-dot {
   width: 7px;
@@ -158,20 +175,26 @@
   }
 }
 
-/* floating glass panel with a mini chart (DCs) */
+/* warehouse chip: name + lowest stock; opens into a small chart on hover */
 .tp {
-  min-width: 168px;
-  padding: 8px 10px 9px;
+  width: 168px;
+  padding: 6px 10px;
   border-radius: 10px;
+  pointer-events: auto;
+  cursor: default;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(21, 23, 26, 0.1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #15171a;
   font-family: var(--font);
-  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.06), 0 10px 24px rgba(21, 23, 26, 0.1);
-  transform: translateY(-50%);
-  transition: border-color 0.3s;
+  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.06), 0 4px 12px rgba(21, 23, 26, 0.08);
+  transition: border-color 0.3s, box-shadow 0.2s;
+}
+.tp:hover,
+.tp.hovered {
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(21, 23, 26, 0.06), 0 12px 28px rgba(21, 23, 26, 0.14);
 }
 .tp-head {
   display: flex;
@@ -181,13 +204,45 @@
 .tp b {
   font-size: 12px;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.tp > i {
+.tp .tp-sum {
+  font-size: 11px;
+  color: #4f555c;
+}
+.tp[data-tone='risk'] .tp-sum {
+  color: var(--amber);
+  font-weight: 600;
+}
+.tp[data-tone='down'] .tp-sum {
+  color: var(--red);
+  font-weight: 600;
+}
+.tp-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.25s ease, opacity 0.2s ease;
+}
+.tp-more > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.tp:hover .tp-more,
+.tp.hovered .tp-more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.tp-more i {
   display: block;
   font-style: normal;
   font-size: 10px;
   color: #868b91;
-  margin: 1px 0 6px 14px;
+  margin: 6px 0 6px 14px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -243,15 +298,14 @@
 /* on phones the warehouse panels shrink to a name and a status dot */
 @media (max-width: 760px) {
   .tp {
-    min-width: 0;
+    width: auto;
     padding: 4px 8px;
     border-radius: 8px;
   }
   .tp b {
     font-size: 10.5px;
   }
-  .tp > i,
-  .tp-bars {
+  .tp-more {
     display: none;
   }
   .tl {

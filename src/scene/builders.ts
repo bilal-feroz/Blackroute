@@ -122,15 +122,21 @@ export interface Panel extends Label {
   setBars(values: { label: string; value: number; text: string; color: string }[]): void;
 }
 
-/** A floating glass panel with a mini bar chart, like a hologram over a building. */
+/**
+ * A compact chip over a building (name + lowest days of stock) that opens into
+ * a small bar chart when you hover the chip or the building itself.
+ */
 export function panel(title: string, sub = ''): Panel {
   const el = document.createElement('div');
   el.className = 'tp';
-  el.innerHTML = `<div class="tp-head"><span class="tl-dot"></span><b></b></div><i></i><div class="tp-bars"></div>`;
+  el.innerHTML = `<div class="tp-head"><span class="tl-dot"></span><b></b><em class="tp-sum"></em></div><div class="tp-more"><div><i></i><div class="tp-bars"></div></div></div>`;
   const b = el.querySelector('b')!;
   const i = el.querySelector('i')!;
+  const sum = el.querySelector('.tp-sum') as HTMLElement;
   const bars = el.querySelector('.tp-bars') as HTMLDivElement;
   const obj = new CSS2DObject(el);
+  // anchor the bottom edge so the chart opens upwards, away from the building
+  obj.center.set(0.5, 1);
   let last = '';
   let lastBars = '';
   const set = (t: string, s = '', tone = 'normal') => {
@@ -154,6 +160,10 @@ export function panel(title: string, sub = ''): Panel {
       const key = values.map((v) => `${v.label}${v.text}${v.value.toFixed(2)}`).join('|');
       if (key === lastBars) return;
       lastBars = key;
+      // the chip shows the product closest to running out
+      const low = values.reduce((a, v) => (v.value < a.value ? v : a), values[0]);
+      sum.textContent = low ? low.text : '';
+      sum.title = low ? `Lowest: ${low.label}` : '';
       bars.innerHTML = values
         .map(
           (v) =>
