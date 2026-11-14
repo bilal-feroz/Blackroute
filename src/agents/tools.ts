@@ -33,7 +33,7 @@ export function leverNames(levers: string[]): string {
 // ---------------------------------------------------------------- Sentinel
 export function sentinelTools(matches: Match[]) {
   return {
-    knownScenarios: SCENARIOS.map((s) => ({ id: s.id, title: s.title, summary: s.summary })),
+    knownScenarios: SCENARIOS.map((s) => ({ id: s.id, title: s.title, summary: s.summary, watchFor: s.keywords })),
     keywordMatches: matches.slice(0, 5).map((m) => ({ scenarioId: m.scenarioId, score: m.score, signalIds: m.signalIds })),
   };
 }
