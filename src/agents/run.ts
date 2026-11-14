@@ -3,7 +3,7 @@
 // against the tool results it was given.
 
 import { checkGrounding, type Grounding } from './grounding';
-import { OUTPUT, type AgentId, type AgentOutput } from './prompts';
+import { OUTPUT, fitLists, type AgentId, type AgentOutput } from './prompts';
 
 export interface AgentReport<K extends AgentId = AgentId> {
   agent: K;
@@ -77,7 +77,7 @@ export async function askAgent<K extends AgentId>(
     });
     const body = (await res.json()) as { ok: boolean; text?: string; model?: string; provider?: string; offline?: boolean; error?: string };
     if (!body.ok || !body.text) return fallback(body.offline ? undefined : `${body.error ?? 'AI unavailable'} Used the rule-based report.`);
-    const parsed = OUTPUT[agent].safeParse(extractJson(body.text));
+    const parsed = OUTPUT[agent].safeParse(fitLists(agent, extractJson(body.text)));
     if (!parsed.success) return fallback('The AI answer did not match the required format. Used the rule-based report.');
     const out = parsed.data as AgentOutput[K];
     if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value!);
