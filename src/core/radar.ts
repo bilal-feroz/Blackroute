@@ -23,6 +23,7 @@ export interface RadarItem {
   boosted: boolean;
 }
 
+/** Starting likelihood of a scenario before any live signal raises it. */
 export function baseLikelihood(s: Scenario): number {
   switch (s.kind) {
     case 'chokepoint':
