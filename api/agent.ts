@@ -8,6 +8,7 @@ import { json, provider, runAgent } from './_lib/llm.js';
 const AGENT_IDS: AgentId[] = ['sentinel', 'tracer', 'strategist', 'redteam', 'dispatcher'];
 const MAX_BODY = 60_000;
 
+/** Runs one agent after checking the key, the rate limit, the request size and its shape. */
 export async function POST(request: Request): Promise<Response> {
   if (!provider()) return json({ ok: false, offline: true, reason: 'No AI key configured on the server.' });
   if (limited(request, 30)) return json({ ok: false, error: 'Too many AI requests, please wait a minute.' }, 429);
