@@ -342,6 +342,7 @@ export class GlobalBoard implements Board {
     this.uae.set('UAE · Jebel Ali', `${sailing} ships inbound`, active && sc?.place === 'global' ? 'risk' : 'normal');
   }
 
+  /** True while a vessel is waiting at the chokepoint that holds it. */
   private isHeldNow(v: VesselTrack, h: number): boolean {
     const o = ORIGIN_BY_ID[v.origin];
     const leg = o?.route.find((r) => r.chokepoint === v.heldAt);
