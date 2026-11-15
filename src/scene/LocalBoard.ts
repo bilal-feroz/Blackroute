@@ -956,6 +956,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Incident marker, dome and dust for the active disruption. */
   private updateEffects(state: TwinState, active: boolean, t: number, dt: number) {
     const sc = state.scenario;
     const spot = active ? this.incidentSpot(state) : null;
