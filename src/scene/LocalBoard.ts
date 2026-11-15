@@ -1030,6 +1030,7 @@ export class LocalBoard implements Board {
     n.ringMat.uniforms.uPulse.value = tone === 'radar' ? 0.4 : 1;
   }
 
+  /** Labels, rings and stock chips for each node, refreshed five times a second. */
   private updateNodes(state: TwinState, run: SimRun | null, h: number, active: boolean) {
     const hi = Math.max(0, Math.floor(h));
     const focus = state.focus;
