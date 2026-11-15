@@ -183,6 +183,7 @@ export function redteamTools(report: RedTeamReport, chosen: Candidate) {
   };
 }
 
+/** Rule-based Red Team report: a verdict and concerns from the stress test results. */
 export function redteamOffline(t: ReturnType<typeof redteamTools>): AgentOutput['redteam'] {
   const failed = t.tests.filter((x) => !x.held);
   return {
