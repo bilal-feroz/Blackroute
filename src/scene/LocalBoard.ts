@@ -873,6 +873,7 @@ export class LocalBoard implements Board {
     });
   }
 
+  /** Flies the cargo plane when air freight is part of the plan. */
   private updatePlane(run: SimRun, h: number, on: boolean) {
     const landing = on && run.trips.find((tr) => tr.from === 'airport' && h >= tr.depart - 3 && h < tr.depart + 0.5);
     this.plane.visible = !!landing;
