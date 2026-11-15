@@ -59,6 +59,7 @@ export class GlobalBoard implements Board {
     this.buildShips();
   }
 
+  /** Slab, sea and the land map drawn onto a texture. */
   private buildBoard() {
     const slab = new THREE.Mesh(new RoundedBoxGeometry(W + 6, 7, H + 6, 6, 2.2), new THREE.MeshStandardMaterial({ color: '#bfc3bb', roughness: 0.8, metalness: 0.05 }));
     slab.position.y = -4.6;
