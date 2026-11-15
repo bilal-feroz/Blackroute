@@ -139,6 +139,7 @@ export class Twin {
     this.loop();
   }
 
+  /** New state from React; a change of view flies the camera. */
   setState(next: TwinState) {
     if (next.view !== this.state.view) this.goTo(next.view);
     this.state = next;
