@@ -1,5 +1,6 @@
 // Plain-English number formatting used across the app.
 
+/** Money in AED, shortened to k or M. */
 export function aed(n: number): string {
   const a = Math.abs(n);
   if (a >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(a >= 10_000_000 ? 0 : 2)}M`;
