@@ -101,6 +101,7 @@ export function tracerTools(scenario: Scenario, run: SimRun, normal: Metrics) {
   };
 }
 
+/** Rule-based Tracer report built only from the do-nothing simulation. */
 export function tracerOffline(t: ReturnType<typeof tracerTools>): AgentOutput['tracer'] {
   const first = t.shortages[0];
   return {
