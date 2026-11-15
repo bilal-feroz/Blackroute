@@ -130,6 +130,8 @@ The company (Falcon Distribution), its DCs and customers are fictional. The port
 
 **Does it need an AI key?** No. Without a key every agent writes its report from rules, using the same simulator numbers. The top bar shows which mode is on.
 
+**Is the data real?** The ports, chokepoints, sea lanes and sailing times are real-world approximations. The company, its DCs and customers are fictional.
+
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
