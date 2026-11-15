@@ -20,6 +20,7 @@ const LAT1 = 58;
 const W = 176;
 const H = (W * (LAT1 - LAT0)) / (LON1 - LON0);
 
+/** Latitude and longitude to a point on the global board. */
 export function project(g: GeoPoint, y = 0): THREE.Vector3 {
   const x = ((g.lon - LON0) / (LON1 - LON0) - 0.5) * W;
   const z = (0.5 - (g.lat - LAT0) / (LAT1 - LAT0)) * H;
