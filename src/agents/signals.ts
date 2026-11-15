@@ -88,6 +88,7 @@ const REPLAY: Record<string, string[]> = {
   al_quoz_outage: ['Simulated alert: power outage hits the Al Quoz industrial area, warehouses on backup power'],
 };
 
+/** A replay feed for one scenario: its simulated alerts plus two calm ones, for a reliable demo. */
 export function replayFeed(scenarioId: string): SignalFeed {
   const now = Date.now();
   const titles = REPLAY[scenarioId] ?? [];
