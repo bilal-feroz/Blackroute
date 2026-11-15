@@ -109,6 +109,7 @@ export function replayFeed(scenarioId: string): SignalFeed {
   };
 }
 
+/** Fetches the live feed (news, weather and dust) from the server. */
 export async function liveFeed(): Promise<SignalFeed> {
   const res = await fetch('/api/signals');
   if (!res.ok) throw new Error(`signals ${res.status}`);
