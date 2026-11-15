@@ -237,6 +237,7 @@ export class GlobalBoard implements Board {
     this.root.add(this.capeLabel.obj);
   }
 
+  /** Instanced ship hulls and tops for the vessels in the simulation. */
   private buildShips() {
     // a tiny low-poly freighter: hull + bridge, instanced
     const hull = new THREE.BoxGeometry(5.2, 1.0, 1.8);
