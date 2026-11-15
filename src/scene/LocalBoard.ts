@@ -508,6 +508,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Trees along the roads. */
   private buildTrees() {
     const parts = modelParts('tree_round');
     const spots: P[] = [];
