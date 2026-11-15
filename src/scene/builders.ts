@@ -175,6 +175,7 @@ export function panel(title: string, sub = ''): Panel {
   };
 }
 
+/** Frees every geometry, material and label under an object. */
 export function disposeTree(root: THREE.Object3D) {
   root.traverse((o) => {
     const m = o as THREE.Mesh;
