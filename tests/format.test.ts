@@ -12,3 +12,11 @@ test('pct shows a share as a percentage', () => {
   expect(fmt.pct(0.881)).toBe('88.1%');
   expect(fmt.pct(0.5, 0)).toBe('50%');
 });
+
+test('days switches between hours and days', () => {
+  expect(fmt.days(null)).toBe('not within 3 weeks');
+  expect(fmt.days(0.2)).toBe('1 h');
+  expect(fmt.days(6)).toBe('6 h');
+  expect(fmt.days(48)).toBe('2.0 days');
+  expect(fmt.days(24 * 12)).toBe('12 days');
+});
