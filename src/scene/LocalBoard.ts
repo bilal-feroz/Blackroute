@@ -840,6 +840,7 @@ export class LocalBoard implements Board {
     this.yard.count = Math.round(this.yardMax * (0.18 + 0.82 * fill));
   }
 
+  /** Animates crane lifts at berths where a ship is unloading. */
   private updateCranes(run: SimRun, h: number, t: number) {
     const busy = [false, false];
     for (const v of run.vessels) {
