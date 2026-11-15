@@ -593,6 +593,7 @@ export class LocalBoard implements Board {
     this.routes.sea = { mesh: lane, mat: laneMat };
   }
 
+  /** Instanced trucks, one draw call per part, for every trip. */
   private buildFleet() {
     const parts = modelParts('truck');
     const MAX = 140;
