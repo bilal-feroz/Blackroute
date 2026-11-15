@@ -1102,6 +1102,7 @@ export class LocalBoard implements Board {
     this.ringTone(this.nodes.north_portal, 'muted');
   }
 
+  /** Frees the geometry, materials and labels. */
   dispose() {
     disposeTree(this.root);
   }
