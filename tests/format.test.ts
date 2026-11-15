@@ -25,3 +25,8 @@ test('dayTime counts days from 1', () => {
   expect(fmt.dayTime(0)).toBe('Day 1, 00:00');
   expect(fmt.dayTime(47.5)).toBe('Day 2, 23:00');
 });
+
+test('tonnes drops the decimal for big numbers', () => {
+  expect(fmt.tonnes(34000)).toBe('34.0 t CO₂');
+  expect(fmt.tonnes(150000)).toBe('150 t CO₂');
+});
