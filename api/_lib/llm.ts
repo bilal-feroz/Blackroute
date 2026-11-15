@@ -118,6 +118,7 @@ export async function runAgent(agent: AgentId, tools: unknown, signals: unknown)
   return { text: data.choices?.[0]?.message?.content ?? '', model: p.model, provider: 'OpenAI-compatible' };
 }
 
+/** A JSON response that is never cached. */
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 }
