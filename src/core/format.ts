@@ -13,6 +13,7 @@ export function pct(x: number, digits = 1): string {
   return `${(x * 100).toFixed(digits)}%`;
 }
 
+/** Hours as hours or days, or 'not within 3 weeks' when it never recovers. */
 export function days(hours: number | null): string {
   if (hours === null) return 'not within 3 weeks';
   const d = hours / 24;
