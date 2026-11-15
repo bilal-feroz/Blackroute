@@ -210,6 +210,7 @@ export class LocalBoard implements Board {
     this.root.add(pool);
   }
 
+  /** Cranes, container yard, lighthouse, the ship pool and the port node. */
   private buildPort() {
     // two ship-to-shore cranes over the berths
     BERTHS.forEach(([, z], i) => {
