@@ -384,6 +384,7 @@ export class GlobalBoard implements Board {
     if (this.ships.instanceColor) this.ships.instanceColor.needsUpdate = true;
   }
 
+  /** Frees the geometry, materials and labels. */
   dispose() {
     disposeTree(this.root);
   }
