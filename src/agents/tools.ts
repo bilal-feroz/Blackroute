@@ -218,6 +218,7 @@ export function dispatcherTools(scenario: Scenario, chosen: Candidate, approvedB
   };
 }
 
+/** Rule-based Dispatcher drafts: messages and a checklist for the approved plan. */
 export function dispatcherOffline(t: ReturnType<typeof dispatcherTools>): AgentOutput['dispatcher'] {
   const messages: AgentOutput['dispatcher']['messages'] = [];
   const has = (id: string) => t.levers.some((l) => l.id === id);
