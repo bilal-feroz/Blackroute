@@ -304,6 +304,7 @@ export class Twin {
     this.labels.render(this.scene, this.camera);
   };
 
+  /** Stops the loop, removes listeners and frees everything. */
   dispose() {
     this.disposed = true;
     cancelAnimationFrame(this.raf);
