@@ -71,6 +71,7 @@ function windowOf(d: Disruption, factor: number): Window {
 
 const inWin = (w: Window | null, h: number) => !!w && h >= w.start && h < w.end;
 
+/** Plays three weeks hour by hour (ships, cranes, trucks, DCs and customers) with an optional disruption and recovery levers. */
 export function simulate(opts: SimOptions = {}): SimRun {
   const H = opts.horizonHours ?? HORIZON_HOURS;
   const levers = new Set<LeverId>(opts.levers ?? []);
