@@ -47,6 +47,7 @@ export class Twin {
   private insets = { top: 0, right: 0, bottom: 0, left: 0 };
   onPick: ((id: string | null) => void) | null = null;
 
+  /** Sets up the renderer, labels, camera, controls, lights and bloom inside the container. */
   constructor(private container: HTMLElement) {
     const w = container.clientWidth || 800;
     const h = container.clientHeight || 600;
