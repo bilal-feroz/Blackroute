@@ -29,3 +29,9 @@ test('toDisruption starts at detection and lasts the planning case', () => {
   expect(d.durationHours).toBe(Math.round(s.defaultDays * 24));
   expect(sc.toDisruption(s, 2).durationHours).toBe(48);
 });
+
+test('metricsBrief rounds numbers for the agents', () => {
+  const b = tools.metricsBrief(simulate({}).metrics);
+  expect(Number.isInteger(b.onTimePct * 10)).toBe(true);
+  expect(Number.isInteger(b.totalCostAed)).toBe(true);
+});
