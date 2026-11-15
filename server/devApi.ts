@@ -29,6 +29,7 @@ async function send(res: ServerResponse, response: Response) {
   res.end(Buffer.from(await response.arrayBuffer()));
 }
 
+/** Vite plugin that serves the /api functions during `npm run dev`, using the same handlers Vercel runs. */
 export function devApi(root: string): Plugin {
   return {
     name: 'blackroute-dev-api',
