@@ -247,6 +247,7 @@ export class Twin {
     return { position: p.target.clone().add(dir.multiplyScalar(this.fitDistance())), target: p.target.clone() };
   }
 
+  /** Matches the renderer and camera to the container and shifts the view beside the panels. */
   private resize() {
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
