@@ -886,6 +886,7 @@ export class LocalBoard implements Board {
     this.plane.rotation.set(0, Math.PI, f < 0.8 ? 0.06 : 0);
   }
 
+  /** Colours each route by status: normal, at risk, disrupted, recovery or black route. */
   private updateRoutes(state: TwinState, active: boolean, acting: boolean, levers: Set<string>) {
     const sc = state.scenario;
     const run = state.run;
