@@ -134,6 +134,9 @@ The company (Falcon Distribution), its DCs and customers are fictional. The port
 
 **Why does the simulator do the maths?** Numbers a model writes cannot be trusted on their own. The simulator computes them and the grounding check flags any number in a report that it cannot trace back.
 
+## Troubleshooting
+
+- **"AI offline · rules" in the top bar:** no AI key is set on the server. Add one to `.env` (or the Vercel environment variables) and restart.
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
