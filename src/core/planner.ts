@@ -137,6 +137,7 @@ function pick(cands: Candidate[], objective: Objective): Candidate {
   return near[0];
 }
 
+/** Screens each lever, combines the best ones, evaluates every candidate and picks the best plan for each goal. */
 export function plan(
   scenario: Scenario,
   disruption: Disruption,
