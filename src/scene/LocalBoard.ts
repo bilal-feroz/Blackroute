@@ -484,6 +484,7 @@ export class LocalBoard implements Board {
     this.addNode('airport', [30, 40], 7, 'Al Maktoum Airport', 6, 'portal');
   }
 
+  /** Gates where roads leave the board: Fujairah, Abu Dhabi and the Northern Emirates. */
   private buildPortals() {
     for (const p of PORTALS) {
       const pos = ROAD_NODES[p.node];
