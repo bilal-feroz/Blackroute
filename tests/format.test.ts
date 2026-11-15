@@ -20,3 +20,8 @@ test('days switches between hours and days', () => {
   expect(fmt.days(48)).toBe('2.0 days');
   expect(fmt.days(24 * 12)).toBe('12 days');
 });
+
+test('dayTime counts days from 1', () => {
+  expect(fmt.dayTime(0)).toBe('Day 1, 00:00');
+  expect(fmt.dayTime(47.5)).toBe('Day 2, 23:00');
+});
