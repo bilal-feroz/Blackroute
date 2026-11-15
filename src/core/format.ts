@@ -33,6 +33,7 @@ export function tonnes(kg: number): string {
   return `${(kg / 1000).toFixed(kg >= 100_000 ? 0 : 1)} t CO₂`;
 }
 
+/** How long ago a time was, in minutes, hours or days. */
 export function ago(iso: string): string {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
   if (mins < 60) return `${Math.max(1, mins)} min ago`;
