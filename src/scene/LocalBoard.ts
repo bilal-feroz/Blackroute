@@ -802,6 +802,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Places trucks on the road for trips in progress at this hour. */
   private updateTrucks(run: SimRun, h: number) {
     let n = 0;
     const max = this.truckParts[0]?.instanceMatrix.count ?? 0;
