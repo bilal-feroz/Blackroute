@@ -48,6 +48,7 @@ export function sentinelSignals(signals: Signal[]) {
     .map((s) => ({ id: s.id, title: s.title.replace(/\s+/g, ' ').trim().slice(0, 200), source: s.source.slice(0, 60), published: s.publishedAt.slice(0, 10) }));
 }
 
+/** Rule-based Sentinel report from the top keyword match; likelihood is capped at 0.6. */
 export function sentinelOffline(signals: Signal[], matches: Match[]): AgentOutput['sentinel'] {
   const top = matches[0];
   if (!top) {
