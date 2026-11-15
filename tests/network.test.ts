@@ -21,3 +21,11 @@ test('every scenario starts with a likelihood between 0 and 1', () => {
     expect(p).toBeLessThan(1);
   }
 });
+
+test('toDisruption starts at detection and lasts the planning case', () => {
+  const s = sc.SCENARIO_BY_ID.hormuz_closure;
+  const d = sc.toDisruption(s);
+  expect(d.startHour).toBe(sc.DETECTION_HOUR);
+  expect(d.durationHours).toBe(Math.round(s.defaultDays * 24));
+  expect(sc.toDisruption(s, 2).durationHours).toBe(48);
+});
