@@ -662,6 +662,7 @@ export class LocalBoard implements Board {
     this.root.add(this.dust);
   }
 
+  /** A node: its status ring and floating label. */
   private addNode(id: string, pos: P, radius: number, title: string, labelY: number, kind = 'node', sub = '') {
     const ringMat = ringMaterial('normal');
     ringMat.uniforms.uPulse.value = 0;
