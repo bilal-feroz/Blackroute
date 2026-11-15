@@ -161,6 +161,7 @@ export class GlobalBoard implements Board {
     return new THREE.CatmullRomCurve3(points.map((p) => project(p, 0.5)), false, 'centripetal', 0.3);
   }
 
+  /** One flow line for each origin's sea lane. */
   private buildLanes() {
     for (const o of ORIGINS) {
       const curve = this.laneCurve(o.lane);
