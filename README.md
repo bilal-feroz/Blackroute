@@ -137,6 +137,9 @@ The company (Falcon Distribution), its DCs and customers are fictional. The port
 ## Troubleshooting
 
 - **"AI offline · rules" in the top bar:** no AI key is set on the server. Add one to `.env` (or the Vercel environment variables) and restart.
+- **No live news:** the free news sources are sometimes rate-limited. Switch the Signals card to Replay for a reliable demo.
+- **The 3D view stays blank:** the twin needs WebGL. Turn on hardware acceleration in the browser.
+
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
