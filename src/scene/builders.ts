@@ -76,6 +76,7 @@ export function arcPoints(a: THREE.Vector3, b: THREE.Vector3, height: number, st
   return out;
 }
 
+/** A tube mesh along a smooth curve through the points. */
 export function tube(points: THREE.Vector3[], radius: number, material: THREE.Material, segments = 120): THREE.Mesh {
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   return new THREE.Mesh(new THREE.TubeGeometry(curve, segments, radius, 8, false), material);
