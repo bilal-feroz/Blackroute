@@ -7,3 +7,8 @@ test('aed shortens to k and M', () => {
   expect(fmt.aed(1046000)).toBe('AED 1.05M');
   expect(fmt.aed(12_400_000)).toBe('AED 12M');
 });
+
+test('pct shows a share as a percentage', () => {
+  expect(fmt.pct(0.881)).toBe('88.1%');
+  expect(fmt.pct(0.5, 0)).toBe('50%');
+});
