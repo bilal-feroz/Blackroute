@@ -9,6 +9,7 @@ export interface Provider {
   model: string;
 }
 
+/** Which AI provider the server is set up for: Gemini first, then any OpenAI-compatible key. Null means rule-based agents. */
 export function provider(): Provider | null {
   if (process.env.GEMINI_API_KEY) return { name: 'gemini', model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' };
   if (process.env.OPENAI_COMPAT_API_KEY) return { name: 'openai-compatible', model: process.env.OPENAI_COMPAT_MODEL || 'openai/gpt-oss-120b' };
