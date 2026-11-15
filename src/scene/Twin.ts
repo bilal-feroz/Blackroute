@@ -240,6 +240,7 @@ export class Twin {
     return Math.max(needW, needH) * 0.84;
   }
 
+  /** The camera preset for a view, pulled back to fit the free screen area. */
   private presetFor(view: TwinView): CameraPreset {
     const p = PRESETS[view];
     const dir = p.position.clone().sub(p.target).normalize();
