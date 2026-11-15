@@ -132,6 +132,8 @@ The company (Falcon Distribution), its DCs and customers are fictional. The port
 
 **Is the data real?** The ports, chokepoints, sea lanes and sailing times are real-world approximations. The company, its DCs and customers are fictional.
 
+**Why does the simulator do the maths?** Numbers a model writes cannot be trusted on their own. The simulator computes them and the grounding check flags any number in a report that it cannot trace back.
+
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
