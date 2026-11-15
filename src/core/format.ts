@@ -21,6 +21,7 @@ export function days(hours: number | null): string {
   return `${d.toFixed(d < 10 ? 1 : 0)} days`;
 }
 
+/** A simulation hour as 'Day N, HH:00'. */
 export function dayTime(hour: number): string {
   const d = Math.floor(hour / 24) + 1;
   const h = Math.floor(hour % 24);
