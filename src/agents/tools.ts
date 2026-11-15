@@ -14,6 +14,7 @@ const r0 = (n: number) => Math.round(n);
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const r3 = (n: number) => Math.round(n * 1000) / 1000;
 
+/** The headline numbers of a simulation run, rounded so an agent can quote them. */
 export function metricsBrief(m: Metrics) {
   return {
     onTimePct: r1(m.serviceLevel * 100),
