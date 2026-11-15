@@ -287,6 +287,7 @@ export class LocalBoard implements Board {
     this.addNode('jebel_ali', [-30, 0], 10, 'Jebel Ali Port', 16);
   }
 
+  /** Road segments and dashed centre lines from the road graph. */
   private buildRoads() {
     const asphalt = new THREE.MeshStandardMaterial({ color: '#8f948d', roughness: 0.9, metalness: 0.0 });
     const lineMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 });
