@@ -615,6 +615,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Incident ring, beam and label, the shut-port dome and the sandstorm dust. */
   private buildEffects() {
     const mat = ringMaterial('down');
     mat.uniforms.uIntensity.value = 2.6;
