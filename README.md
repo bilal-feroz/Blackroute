@@ -140,6 +140,10 @@ The company (Falcon Distribution), its DCs and customers are fictional. The port
 - **No live news:** the free news sources are sometimes rate-limited. Switch the Signals card to Replay for a reliable demo.
 - **The 3D view stays blank:** the twin needs WebGL. Turn on hardware acceleration in the browser.
 
+## Using the twin
+
+Drag to rotate, scroll to zoom, hover a building to see its stock, and click a building or label to open its details.
+
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
