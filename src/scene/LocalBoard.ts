@@ -552,6 +552,7 @@ export class LocalBoard implements Board {
     return n;
   }
 
+  /** Flow lines: port to DCs, DCs to customers, and the inbound sea lane. */
   private buildRoutes() {
     for (const dc of DCS) {
       const dock = ROAD_NODES[DOCK_OF[dc.id]];
