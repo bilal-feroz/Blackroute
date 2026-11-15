@@ -433,6 +433,7 @@ export class LocalBoard implements Board {
     this.pickables.push(spire);
   }
 
+  /** Runway, terminal and the cargo plane. */
   private buildAirport() {
     const runway = new THREE.Mesh(new THREE.BoxGeometry(44, 0.14, 4.6), new THREE.MeshStandardMaterial({ color: '#9ea39b', roughness: 0.9 }));
     runway.position.set(26, 0.07, 48.5);
