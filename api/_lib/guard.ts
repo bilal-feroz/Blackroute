@@ -3,6 +3,7 @@
 
 const hits = new Map<string, number[]>();
 
+/** The visitor's IP from the proxy headers, used as the rate-limit key ('local' in dev). */
 export function clientKey(request: Request): string {
   const fwd = request.headers.get('x-forwarded-for') ?? '';
   return fwd.split(',')[0].trim() || request.headers.get('x-real-ip') || 'local';
