@@ -134,6 +134,7 @@ export const SCENARIOS: Scenario[] = [
 
 export const SCENARIO_BY_ID = Object.fromEntries(SCENARIOS.map((s) => [s.id, s])) as Record<string, Scenario>;
 
+/** Turns a scenario into a disruption for the simulator: when it starts and how long it lasts. */
 export function toDisruption(s: Scenario, days = s.defaultDays, startHour = DETECTION_HOUR): Disruption {
   return { kind: s.kind, target: s.target, startHour, durationHours: Math.round(days * 24) };
 }
