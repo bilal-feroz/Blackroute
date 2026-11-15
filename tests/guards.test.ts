@@ -12,3 +12,9 @@ test('fitLists trims long lists and leaves other values alone', () => {
   expect((prompts.fitLists('tracer', long) as typeof long).affected).toHaveLength(8);
   expect(prompts.fitLists('tracer', 'text')).toBe('text');
 });
+
+test('replay signals are labelled as simulated', () => {
+  const feed = sig.replayFeed('hormuz_closure');
+  expect(feed.mode).toBe('replay');
+  for (const s of feed.signals) expect(s.title.startsWith('Simulated alert')).toBe(true);
+});
