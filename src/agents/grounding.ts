@@ -14,6 +14,7 @@ export interface Grounding {
   ok: boolean;
 }
 
+/** Lists every number in an agent's text that cannot be traced to its tool results, allowing normal rounding. */
 export function checkGrounding(output: unknown, ...sources: unknown[]): Grounding {
   const allowed: number[] = [];
   for (const s of sources) collectNumbers(s, allowed);
