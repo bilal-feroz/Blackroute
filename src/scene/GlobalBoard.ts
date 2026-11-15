@@ -179,6 +179,7 @@ export class GlobalBoard implements Board {
     this.cape = { mesh: capeMesh, mat: capeMat, curve: capeCurve };
   }
 
+  /** Pins and labels for ports and chokepoints. */
   private buildMarkers() {
     for (const c of CHOKEPOINTS) {
       const p = project(c.geo);
