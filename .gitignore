@@ -31,3 +31,6 @@ Thumbs.db
 
 # progress workbook holds personal contact details: keep it out of the public repo
 submissions/*Workbook*
+
+# launch video workspace (large media)
+brag-output*/
