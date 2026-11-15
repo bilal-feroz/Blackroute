@@ -204,6 +204,7 @@ export function modelParts(name: string): { geometry: THREE.BufferGeometry; mate
   return parts;
 }
 
+/** Recolours the tinted parts of a model copy, such as trucks and containers. */
 export function tint(obj: THREE.Object3D, color: THREE.ColorRepresentation, glow = 0) {
   obj.traverse((o) => {
     const m = o as THREE.Mesh;
