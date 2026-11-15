@@ -829,6 +829,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Container stacks grow and shrink with the port's stock. */
   private updateYard(run: SimRun, h: number) {
     const s = run.stockSeries.jebel_ali;
     if (!s) return;
