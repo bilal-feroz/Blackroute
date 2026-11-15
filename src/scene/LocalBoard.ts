@@ -358,6 +358,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** Dubai towers and the spire, with window textures. */
   private buildSkyline() {
     const towers: { x: number; z: number; w: number; d: number; h: number }[] = [
       { x: 52, z: 22, w: 4, d: 4, h: 12 },
