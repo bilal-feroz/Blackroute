@@ -123,6 +123,7 @@ function nightMaterial(src: THREE.Material): THREE.MeshStandardMaterial {
 let library: Record<string, THREE.Object3D> | null = null;
 const baked = new Map<string, THREE.Group>();
 
+/** Loads the model kit once and bakes each model into merged meshes. */
 export async function loadKit(onProgress?: (f: number) => void): Promise<void> {
   if (library) return;
   const gltf = await new GLTFLoader().loadAsync(`${import.meta.env.BASE_URL}models/kit.glb`, (e) => {
