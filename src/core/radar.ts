@@ -43,6 +43,7 @@ export function baseLikelihood(s: Scenario): number {
   }
 }
 
+/** The name of the link a scenario breaks: a chokepoint, port, DC or road. */
 export function linkName(s: Scenario): string {
   switch (s.kind) {
     case 'chokepoint':
