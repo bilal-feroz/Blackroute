@@ -536,6 +536,7 @@ export class LocalBoard implements Board {
     }
   }
 
+  /** A flat flow ribbon along a road path, kept as a named route. */
   private routeRibbon(id: string, path: P[], tone: Tone, width = 1.1, y = 0.22) {
     const mat = flowMaterial(tone, { speed: 0.4, dashes: Math.max(3, Math.round(this.lengthOf(path) / 9)) });
     const mesh = new THREE.Mesh(ribbon(roundCorners(path, 2.4), width, y), mat);
