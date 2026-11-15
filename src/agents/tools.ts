@@ -131,6 +131,7 @@ function candidateBrief(c: Candidate) {
   };
 }
 
+/** Tool results for the Strategist: doing nothing, the recommended plan, the runner-up, the best plan per goal and the cost of waiting. */
 export function strategistTools(p: PlanResult, waiting: WaitingCost[]) {
   const runnerUp = p.candidates.find((c) => c !== p.recommended);
   return {
