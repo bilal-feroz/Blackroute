@@ -51,6 +51,7 @@ export class GlobalBoard implements Board {
   private capeLabel!: Label;
   private labelTimer = 0;
 
+  /** Builds the board, the sea lanes, the port and chokepoint markers and the ships. */
   constructor() {
     this.buildBoard();
     this.buildLanes();
