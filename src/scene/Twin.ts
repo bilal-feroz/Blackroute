@@ -145,6 +145,7 @@ export class Twin {
     this.state = next;
   }
 
+  /** Flies the camera to a view's preset and swaps the boards halfway. */
   private goTo(view: TwinView) {
     const from = { position: this.camera.position.clone(), target: this.controls.target.clone() };
     this.fly = { from, to: this.presetFor(view), t: 0 };
