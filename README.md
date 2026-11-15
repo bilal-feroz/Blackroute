@@ -126,6 +126,10 @@ tests/         Vitest suites
 
 The company (Falcon Distribution), its DCs and customers are fictional. The ports, chokepoints, sea lanes and sailing times are real-world approximations. Base likelihoods are illustrative and are raised by live signals. Live news comes from GDELT, with Google News RSS as a fallback; weather and dust come from Open-Meteo.
 
+## FAQ
+
+**Does it need an AI key?** No. Without a key every agent writes its report from rules, using the same simulator numbers. The top bar shows which mode is on.
+
 ## Built with
 
 Three.js, React, Vite, TypeScript, Zod, Lucide icons, Natural Earth land data (via world-atlas and topojson-client), GDELT, Google News RSS and Open-Meteo. Built with Claude Code as an AI coding partner.
