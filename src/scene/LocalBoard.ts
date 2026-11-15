@@ -545,6 +545,7 @@ export class LocalBoard implements Board {
     this.routes[id] = { mesh, mat };
   }
 
+  /** Total length of a path. */
   private lengthOf(path: P[]) {
     let n = 0;
     for (let i = 1; i < path.length; i++) n += Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]);
