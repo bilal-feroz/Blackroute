@@ -67,6 +67,7 @@ function toJsonSchema(s: unknown): unknown {
   return out;
 }
 
+/** Calls the model once for one agent and returns its raw JSON text; the browser validates it. */
 export async function runAgent(agent: AgentId, tools: unknown, signals: unknown): Promise<{ text: string; model: string; provider: string }> {
   const p = provider();
   if (!p) throw new Error('no-provider');
