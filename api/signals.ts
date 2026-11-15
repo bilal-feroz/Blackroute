@@ -136,6 +136,7 @@ async function weather(): Promise<{ signal: Signal | null; summary: WeatherSumma
   return { signal, summary };
 }
 
+/** Live signals: news (GDELT, with Google News RSS as fallback) plus Dubai weather and dust, cached for 10 minutes. */
 export async function GET(request: Request): Promise<Response> {
   if (cache && Date.now() - cache.at < TTL) return json(cache.body);
   if (limited(request, 20)) return json({ fetchedAt: new Date().toISOString(), signals: [], weather: null, errors: ['Too many requests, please wait a minute.'] }, 429);
