@@ -38,6 +38,7 @@ function secondShock(scenario: Scenario, d: Disruption): { shock: Disruption; la
   return { shock: { kind: 'weather', target: 'uae', startHour: d.startHour + 24, durationHours: 48 }, label: 'A sandstorm hits while the network is already stretched' };
 }
 
+/** Runs the five stress tests on a plan: longer, demand surge, second shock, late start and the unluckiest future. */
 export function redTeam(scenario: Scenario, disruption: Disruption, levers: LeverId[]): RedTeamReport {
   const run = (extra: Partial<Parameters<typeof simulate>[0]>) => simulate({ disruption, levers, ...extra }).metrics;
   const tests: StressTest[] = [];
