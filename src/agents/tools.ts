@@ -146,6 +146,7 @@ export function strategistTools(p: PlanResult, waiting: WaitingCost[]) {
   };
 }
 
+/** Rule-based Strategist report: recommends the planner's pick and explains it with its numbers. */
 export function strategistOffline(t: ReturnType<typeof strategistTools>): AgentOutput['strategist'] {
   const rec = t.recommended;
   const none = t.doNothing;
