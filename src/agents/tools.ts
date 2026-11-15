@@ -27,6 +27,7 @@ export function metricsBrief(m: Metrics) {
   };
 }
 
+/** Plain names of a plan's levers joined with '+', or 'Monitor and hold' when there are none. */
 export function leverNames(levers: string[]): string {
   return levers.length ? levers.map((l) => LEVER_BY_ID[l as keyof typeof LEVER_BY_ID].name).join(' + ') : 'Monitor and hold (no levers)';
 }
