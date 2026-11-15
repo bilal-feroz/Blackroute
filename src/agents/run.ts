@@ -51,6 +51,7 @@ function extractJson(text: string): unknown {
   }
 }
 
+/** Runs one agent: the AI when available (validated and grounding-checked), otherwise its rule-based report. */
 export async function askAgent<K extends AgentId>(
   agent: K,
   tools: unknown,
