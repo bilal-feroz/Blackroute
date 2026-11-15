@@ -351,6 +351,7 @@ export class GlobalBoard implements Board {
     return h >= holdStart && h < holdStart + (v.eta - v.plannedEta);
   }
 
+  /** Places every vessel along its lane for the current hour, in red while it is held. */
   private updateShips(run: SimRun, h: number) {
     let n = 0;
     const max = this.ships.instanceMatrix.count;
