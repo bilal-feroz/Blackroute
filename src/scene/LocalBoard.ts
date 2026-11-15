@@ -315,6 +315,7 @@ export class LocalBoard implements Board {
     this.root.add(inst);
   }
 
+  /** The three DCs with their stock chips, plus the customer sites. */
   private buildBuildings() {
     for (const dc of DCS) {
       const spec = DC_POS[dc.id];
