@@ -156,6 +156,7 @@ export class GlobalBoard implements Board {
     this.root.add(under);
   }
 
+  /** A smooth curve through a sea lane's waypoints, just above the water. */
   private laneCurve(points: GeoPoint[]): THREE.CatmullRomCurve3 {
     return new THREE.CatmullRomCurve3(points.map((p) => project(p, 0.5)), false, 'centripetal', 0.3);
   }
