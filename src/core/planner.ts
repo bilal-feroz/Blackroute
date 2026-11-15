@@ -67,6 +67,7 @@ function percentile(xs: number[], p: number): number {
   return s[Math.min(s.length - 1, Math.max(0, Math.floor(p * (s.length - 1))))];
 }
 
+/** Simulates one set of levers across random futures and sums up service, cost, CO2 and how often it held. */
 export function evaluate(disruption: Disruption, levers: LeverId[], futures: number, seed = 7, actHour?: number): Candidate {
   const expected = simulate({ disruption, levers, actHour }).metrics;
   const rand = mulberry32(seed);
