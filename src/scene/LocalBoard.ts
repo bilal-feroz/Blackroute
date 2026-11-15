@@ -136,6 +136,7 @@ export class LocalBoard implements Board {
   private dummy = new THREE.Object3D();
   private grid!: THREE.ShaderMaterial;
 
+  /** Builds the Dubai board: port, roads, buildings, skyline, airport, gates, trees, routes, trucks and effects. */
   constructor() {
     this.buildBoard();
     this.buildPort();
