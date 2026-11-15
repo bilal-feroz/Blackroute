@@ -28,6 +28,7 @@ export function dayTime(hour: number): string {
   return `Day ${d}, ${String(h).padStart(2, '0')}:00`;
 }
 
+/** Kilograms of CO2 as tonnes. */
 export function tonnes(kg: number): string {
   return `${(kg / 1000).toFixed(kg >= 100_000 ? 0 : 1)} t CO₂`;
 }
