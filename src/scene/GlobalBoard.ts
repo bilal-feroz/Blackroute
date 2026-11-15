@@ -296,6 +296,7 @@ export class GlobalBoard implements Board {
     return { p, dir, tone };
   }
 
+  /** Per frame: moves the ships, recolours the lanes and updates the labels for the current hour. */
   update(state: TwinState, dt: number) {
     const run = state.run;
     const h = state.hour;
