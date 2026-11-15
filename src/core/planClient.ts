@@ -6,6 +6,7 @@ import type { Disruption } from './types';
 let worker: Worker | null = null;
 let nextId = 1;
 
+/** Runs the plan search in a web worker so the 3D view stays smooth; falls back to the main thread. */
 export function runPlanner(scenarioId: string, disruption: Disruption, futures: number, onProgress?: (p: PlanProgress) => void): Promise<PlanResult> {
   if (typeof Worker === 'undefined') {
     return Promise.resolve(plan(SCENARIO_BY_ID[scenarioId], disruption, { futures, onProgress }));
