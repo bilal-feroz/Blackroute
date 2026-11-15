@@ -8,6 +8,7 @@ export function aed(n: number): string {
   return `AED ${Math.round(n).toLocaleString('en-US')}`;
 }
 
+/** A 0-1 share as a percentage. */
 export function pct(x: number, digits = 1): string {
   return `${(x * 100).toFixed(digits)}%`;
 }
