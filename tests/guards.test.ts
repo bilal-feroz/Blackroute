@@ -18,3 +18,8 @@ test('replay signals are labelled as simulated', () => {
   expect(feed.mode).toBe('replay');
   for (const s of feed.signals) expect(s.title.startsWith('Simulated alert')).toBe(true);
 });
+
+test('the Sentinel can name every scenario or none', () => {
+  expect(prompts.SCENARIO_IDS).toContain('none');
+  expect(prompts.SCENARIO_IDS).toContain('hormuz_closure');
+});
