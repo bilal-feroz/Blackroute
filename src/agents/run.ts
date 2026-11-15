@@ -27,6 +27,7 @@ export interface AiStatus {
   model: string;
 }
 
+/** Asks the server which AI model is on; null when none is set up or the server cannot be reached. */
 export async function aiStatus(): Promise<AiStatus | null> {
   try {
     const res = await fetch('/api/status');
